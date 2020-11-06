@@ -9,32 +9,33 @@ brand_dict = {'MP Biomedicals': '1', 'BioPointe Scientific': '2', 'Atgen': '3', 
               'Tarsons': '6', 'Alfa Chemika': '7', 'Ansell': '8', 'Ansell12': '9', 'Kingfisher': '10', 'Test brand shub': '11', 'Biomall': '12'}
 
 
+#autocomplete 
 @app.route('/autocomplete', methods=["POST"])
 def autocomplete():
-    response = request.get_json()
-    input = response["input"]
+    response = request.get_json()                       #extract request body
+    input = response["input"]                           #extracting input from request body
     res = es.search(index='biomall', body={"query": {
         "query_string": {
-            "query": input}}})
+            "query": input}}})      
     return jsonify(res)
 
-
+#autocomplete with size 
 @app.route('/autocomplete_size', methods=["POST"])
 def autocomplete_size():
-    response = request.get_json()
-    input = response["input"]
-    size = response["size"]
+    response = request.get_json()                       #request body extraction
+    input = response["input"]                           #extracting input from request body
+    size = response["size"]                             #extracting size from request body
     res = es.search(index='biomall', body={"query": {
         "query_string": {
-            "query": input}}, "size": size})
+            "query": input}}, "size": size})    
     return jsonify(res)
 
-
+#autocomplete with hightlight feature-return html-code snippet to highlight 
 @app.route('/autocomplete_highlight', methods=["POST"])
 def autocomplete_highlight():
-    requestf = request.get_json()
-    input = requestf["input"]
-    input_field = requestf["input_field"]
+    requestf = request.get_json()                        #request body extraction
+    input = requestf["input"]                            #extracting input from request body
+    input_field = requestf["input_field"]                #extracting field_name_input from request body
     res = es.search(index='biomall', body={
         "query": {
             "query_string": {
@@ -51,10 +52,10 @@ def autocomplete_highlight():
 
 @app.route('/autocomplete_highlight_size', methods=["POST"])
 def autocomplete_highlight_size():
-    requestf = request.get_json()
-    input = requestf["input"]
-    input_field = requestf["input_field"]
-    size = requestf["size"]
+    requestf = request.get_json()                       #request body extraction
+    input = requestf["input"]                           #extracting input from request body
+    input_field = requestf["input_field"]               #extracting field_name_input from request body
+    size = requestf["size"]                             #extractng size from request body
     res = es.search(index='biomall', body={
         "query": {
             "query_string": {
@@ -72,8 +73,8 @@ def autocomplete_highlight_size():
 
 @app.route('/search_query_by_string', methods=['POST'])
 def search_query_by_string():
-    requestf = request.get_json()
-    input = requestf["input"]
+    requestf = request.get_json()                       #request body extraction   
+    input = requestf["input"]                           #extracting search input from request body
     res = es.search(index='biomall', body={
         "query": {
             "query_string": {
@@ -86,9 +87,9 @@ def search_query_by_string():
 
 @app.route('/search_query_by_string_spellchecker', methods=['POST'])
 def search_query_by_string_spellchecker():
-    requestf = request.get_json()
-    input = requestf["input"]
-    input_field = requestf["input_field"]
+    requestf = request.get_json()                       #request body extraction
+    input = requestf["input"]                           #extracting input from request body
+    input_field = requestf["input_field"]               #extracting field_name_input from request body
     res = es.search(index='biomall', body={
         "query": {
             "fuzzy": {
@@ -114,13 +115,13 @@ def search_query_by_string_spellchecker():
 
 @app.route('/filter_range', methods=["POST"])
 def filter_range():
-    requestf = request.get_json()
+    requestf = request.get_json()                       #request body extraction
     print(requestf)
-    search_field = requestf["search_field"]
-    input = requestf["input"]
-    range_field = requestf["range_field"]
-    range_min_val = requestf["range_min_val"]
-    range_max_val = requestf["range_max_val"]
+    search_field = requestf["search_field"]             #extracting field_name_input from request body
+    input = requestf["input"]                           #extracting input from request body
+    range_field = requestf["range_field"]               #extracting range field name 
+    range_min_val = requestf["range_min_val"]           #extracting minimum value 
+    range_max_val = requestf["range_max_val"]           #extracting maximum value 
     res = es.search(index='biomall', body={
         "query": {
             "bool": {
@@ -138,10 +139,10 @@ def filter_range():
 
 @app.route('/filter_range_mul', methods=["POST"])
 def filter_range_mul():
-    requestf = request.get_json()
-    search_field = requestf["search_field"]
-    input = requestf["input"]
-    range_fields_value = requestf["range_fields_value"]
+    requestf = request.get_json()                           #request body extraction
+    search_field = requestf["search_field"]                 #extracting field_name_input from request body
+    input = requestf["input"]                               #extracting input from request body
+    range_fields_value = requestf["range_fields_value"]     #extracting range field name and minimum value , maximum value from request body
     filter_list = []
     for range_field in range_fields_value.keys():
         filter_list.append({"range": {range_field: {
@@ -163,11 +164,11 @@ def filter_range_mul():
 
 @app.route('/filter_term', methods=["POST"])
 def filter_term():
-    requestf = request.get_json()
-    search_field = requestf["search_field"]
-    search_input = requestf["search_input"]
-    filter_term = requestf["filter_term"]
-    filter_term_name = requestf["filter_term_name"]
+    requestf = request.get_json()                               #request body extraction
+    search_field = requestf["search_field"]                     #extracting field_name_input from request body
+    search_input = requestf["search_input"]                     #extracting input from request body
+    filter_term = requestf["filter_term"]                       #extracting filter term field name
+    filter_term_name = requestf["filter_term_name"]             #extracting filter term field input
     if filter_term == "category":
         filter_term_name = cat_dict[filter_term_name]
         filter_term = "cat_id"
@@ -191,10 +192,10 @@ def filter_term():
 
 @app.route('/filter_term_mul', methods=["POST"])
 def filter_term_mul():
-    requestf = request.get_json()
-    search_field = requestf["search_field"]
-    search_input = requestf["search_input"]
-    field_terms = requestf["filter_terms"]
+    requestf = request.get_json()                           #request body extraction
+    search_field = requestf["search_field"]                 #extracting field_name_input from request body
+    search_input = requestf["search_input"]                 #extracting input from request body
+    field_terms = requestf["filter_terms"]                  #extracting filter term field name and field input fromr request bodys
     filter_list = []
     for field in field_terms.keys():
         if field == "category":
@@ -220,14 +221,14 @@ def filter_term_mul():
 
 @app.route('/filter_range_size', methods=["POST"])
 def filter_range_size():
-    requestf = request.get_json()
+    requestf = request.get_json()                       #request body extraction
     print(requestf)
-    search_field = requestf["search_field"]
-    input = requestf["input"]
-    range_field = requestf["range_field"]
-    range_min_val = requestf["range_min_val"]
-    range_max_val = requestf["range_max_val"]
-    size = requestf["size"]
+    search_field = requestf["search_field"]             #extracting field_name_input from request body
+    input = requestf["input"]                           #extracting input from request body
+    range_field = requestf["range_field"]               #extracting range field name from request body
+    range_min_val = requestf["range_min_val"]           #extracting minimum value for range
+    range_max_val = requestf["range_max_val"]           #extracting maximum value for range
+    size = requestf["size"]                             #extractng size from request body
     res = es.search(index='biomall', body={
         "query": {
             "bool": {
@@ -245,11 +246,11 @@ def filter_range_size():
 
 @app.route('/filter_range_mul_size', methods=["POST"])
 def filter_range_mul_size():
-    requestf = request.get_json()
-    size = requestf["size"]
-    search_field = requestf["search_field"]
-    input = requestf["input"]
-    range_fields_value = requestf["range_fields_value"]
+    requestf = request.get_json()                               #request body extraction
+    size = requestf["size"]                                     #extractng size from request body
+    search_field = requestf["search_field"]                     #extracting field_name_input from request body
+    input = requestf["input"]                                   #extracting input from request body
+    range_fields_value = requestf["range_fields_value"]         #range field values extracted from request body, minimum and maximum value
     filter_list = []
     for range_field in range_fields_value.keys():
         filter_list.append({"range": {range_field: {
@@ -272,12 +273,12 @@ def filter_range_mul_size():
 
 @app.route('/filter_term_size', methods=["POST"])
 def filter_term_size():
-    requestf = request.get_json()
-    search_field = requestf["search_field"]
-    search_input = requestf["search_input"]
-    filter_term = requestf["filter_term"]
-    filter_term_name = requestf["filter_term_name"]
-    size = requestf["size"]
+    requestf = request.get_json()                       #request body extraction
+    search_field = requestf["search_field"]             #extracting field_name_input from request body
+    search_input = requestf["search_input"]             #extracting input from request body
+    filter_term = requestf["filter_term"]               #filter field name 
+    filter_term_name = requestf["filter_term_name"]     #filtered input according to filter field
+    size = requestf["size"]                             #extractng size from request body
     if filter_term == "category":
         filter_term_name = cat_dict[filter_term_name]
         filter_term = "cat_id"
@@ -301,12 +302,12 @@ def filter_term_size():
 
 @app.route('/filter_term_mul_size', methods=["POST"])
 def filter_term_mul_size():
-    requestf = request.get_json()
-    search_field = requestf["search_field"]
-    search_input = requestf["search_input"]
-    field_terms = requestf["filter_terms"]
+    requestf = request.get_json()           #request body extraction
+    search_field = requestf["search_field"] #extracting field_name_input from request body
+    search_input = requestf["search_input"] #extracting input from request body
+    field_terms = requestf["filter_terms"]  #extracting filter_terms from request body
     filter_list = []
-    size = requestf["size"]
+    size = requestf["size"]                 #extractng size from request body
     for field in field_terms.keys():
         if field == "category":
             filter_list.append(
@@ -348,18 +349,18 @@ def filter():
 
 @app.route('/insert_one_product', methods=["POST"])
 def insert_one_product():
-    requestf = request.get_json()
-    data = requestf["data"]
-    id = requestf["id"]
+    requestf = request.get_json()                               #request body extraction
+    data = requestf["data"]                                     #extract data to be inserted
+    id = requestf["id"]                                         #extract id for document
     res = es.index(index="biomall", id=id, body=data)
     return "success"
 
 
 @app.route('/search_by_index_and_id', methods=['POST'])
 def search_by_index_and_id():
-    requestf = request.get_json()
-    index = requestf["index"]
-    id = requestf["id"]
+    requestf = request.get_json()                               #request body extraction
+    index = requestf["index"]                                   #extract index name from request body
+    id = requestf["id"]                                         #extract id for document
     res = es.get(
         index=index,
         id=id

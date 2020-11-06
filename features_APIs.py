@@ -370,13 +370,13 @@ def search_by_index_and_id():
 
 @app.route('/filter_range_sort', methods=['GET', 'POST'])
 def filter_range_sort():
-    response = request.get_json()
-    print(response)
-    search_field = response["search_field"]
-    input = response["input"]
-    sort_parameter = response["sort"]
-    sort_type = response["sort_type"]
-    range_fields_value = response["range_field_value"]
+    response = request.get_json()                                #request body extraction
+    
+    search_field = response["search_field"]                      #extract search field name from request body
+    input = response["input"]                                    #extract input from request body
+    sort_parameter = response["sort"]                            #extract sort field name from the request body
+    sort_type = response["sort_type"]                            #extract sorting type from request body
+    range_fields_value = response["range_field_value"]           #extract dictionary of range value pair from request body
 
     filter_list = []
     for range_field in range_fields_value.keys():
@@ -407,13 +407,13 @@ def filter_range_sort():
 def filter_range_multiple_variable_sort():
     response = request.get_json()
     print(response)
-    search_field = response["search_field"]
-    input = response["input"]
-    sort1_parameter = response["sort1"]
-    sort2_parameter = response["sort2"]
-    sort1_type = response["sort1_type"]
-    sort2_type = response["sort2_type"]
-    range_fields_value = response["range_fields_value"]
+    search_field = response["search_field"]              #extract search field name from request body
+    input = response["input"]                            #extract input from request body
+    sort1_parameter = response["sort1"]                  #extract sort field name from the request body
+    sort2_parameter = response["sort2"]                  #extract sort field name from the request body
+    sort1_type = response["sort1_type"]                  #extract sorting type from request body
+    sort2_type = response["sort2_type"]                  #extract sorting type from request body
+    range_fields_value = response["range_fields_value"]  #extract dictionary of range value pair from request body
 
     filter_list = []
     for range_field in range_fields_value.keys():
@@ -442,15 +442,15 @@ def filter_range_multiple_variable_sort():
 
 @app.route('/filter_term_sort', methods=['GET', 'POST'])
 def filter_term_sort():
-    response = request.get_json()
+    response = request.get_json()                         #request body extraction
     print(response)
-    search_field = response["search_field"]
-    input = response["input"]
-    term_field = response["term"]
-    term_value = response["term_value"]
-    sort_parameter = response["sort"]
+    search_field = response["search_field"]               #extract search field name from request body
+    input = response["input"]                             #extract input from request body
+    term_field = response["term"]                         #extract term field name from the request body
+    term_value = response["term_value"]                   #extract term value from the request body
+    sort_parameter = response["sort"]                     #extract sort field name from the request body
 
-    sort_type = response["sort_type"]
+    sort_type = response["sort_type"]                     #extract sorting type from request body
     if term_field == "category":
         term_value = cat_dict[term_value]
         term_field = "cat_id"
@@ -481,16 +481,16 @@ def filter_term_sort():
 
 @app.route('/filter_multiple_variable_term_sort', methods=['GET', 'POST'])
 def filter_multiple_variable_term_sort():
-    response = request.get_json()
-    search_field = response["search_field"]
-    field_terms = response["filter_terms"]
+    response = request.get_json()                            #request body extraction
+    search_field = response["search_field"]                  #extract search field name from request body
+    field_terms = response["filter_terms"]                   #extract dict containing terms and values
     print(response)
 
     input = response["input"]
-    sort1_parameter = response["sort1"]
-    sort2_parameter = response["sort2"]
-    sort1_type = response["sort1_type"]
-    sort2_type = response["sort2_type"]
+    sort1_parameter = response["sort1"]                      #extract sort field name from the request body
+    sort2_parameter = response["sort2"]                      #extract sort field name from the request body
+    sort1_type = response["sort1_type"]                      #extract sorting type from request body
+    sort2_type = response["sort2_type"]                      #extract sorting type from request body
     filter_list = []
     for field in field_terms.keys():
         if field == "category":
@@ -525,15 +525,15 @@ def filter_multiple_variable_term_sort():
 
 @app.route('/filter_range_sort_size', methods=['GET', 'POST'])
 def filter_range_sort_size():
-    response = request.get_json()
+    response = request.get_json()                                   #request body extraction
     print(response)
-    search_field = response["search_field"]
-    input = response["input"]
-    size = response["size"]
+    search_field = response["search_field"]                         #extract search field name from request body
+    input = response["input"]                                       #extract input from request body
+    size = response["size"]                                         #extract size from request body
 
-    sort_parameter = response["sort"]
-    sort_type = response["sort_type"]
-    range_fields_value = response["range_field_value"]
+    sort_parameter = response["sort"]                               #extract sort field name from the request body
+    sort_type = response["sort_type"]                               #extract sorting type from the request body
+    range_fields_value = response["range_field_value"]              #extract dict of range field values
 
     filter_list = []
     for range_field in range_fields_value.keys():
@@ -563,16 +563,16 @@ def filter_range_sort_size():
 
 @app.route('/filter_range_multiple_variable_sort_size', methods=['GET', 'POST'])
 def filter_range_multiple_variable_sort_size():
-    response = request.get_json()
+    response = request.get_json()                      #request body extraction
     print(response)
-    size = response["size"]
-    search_field = response["search_field"]
-    input = response["input"]
-    sort1_parameter = response["sort1"]
-    sort2_parameter = response["sort2"]
-    sort1_type = response["sort1_type"]
-    sort2_type = response["sort2_type"]
-    range_fields_value = response["range_fields_value"]
+    size = response["size"]                            #extract size from the request body
+    search_field = response["search_field"]            #extract search field name from request body
+    input = response["input"]                          #extract input from request body
+    sort1_parameter = response["sort1"]                #extract sort field name from the request body
+    sort2_parameter = response["sort2"]                #extract sort field name from the request body
+    sort1_type = response["sort1_type"]                #extract sorting type from the request body
+    sort2_type = response["sort2_type"]                #extract sorting type from the request body
+    range_fields_value = response["range_fields_value"] #extract dict of range field name and value
 
     filter_list = []
     for range_field in range_fields_value.keys():
@@ -602,16 +602,16 @@ def filter_range_multiple_variable_sort_size():
 
 @app.route('/filter_term_sort_size', methods=['GET', 'POST'])
 def filter_term_sort_size():
-    response = request.get_json()
-    print(response)
-    size = response["size"]
-    search_field = response["search_field"]
-    input = response["input"]
-    term_field = response["term"]
-    term_value = response["term_value"]
-    sort_parameter = response["sort"]
+    response = request.get_json()                              #request body extraction
+    print(response)                                  
+    size = response["size"]                                    #extract size from the request body          
+    search_field = response["search_field"]                    #extract search field name from request body
+    input = response["input"]                                  #extract input from request body
+    term_field = response["term"]                              #extract term name from the request body
+    term_value = response["term_value"]                        #extract term value from the request body
+    sort_parameter = response["sort"]                          #extract sort field name from the request body
 
-    sort_type = response["sort_type"]
+    sort_type = response["sort_type"]                          #extract sorting type from the request body
     if term_field == "category":
         term_value = cat_dict[term_value]
         term_field = "cat_id"
@@ -643,16 +643,16 @@ def filter_term_sort_size():
 
 @app.route('/filter_multiple_variable_term_sort_size', methods=['GET', 'POST'])
 def filter_multiple_variable_term_sort_size():
-    response = request.get_json()
-    size = response["size"]
-    search_field = response["search_field"]
-    field_terms = response["filter_terms"]
+    response = request.get_json()                                    #request body extraction
+    size = response["size"]                                          #extract size from the request body
+    search_field = response["search_field"]                          #extract search field name from request body
+    field_terms = response["filter_terms"]                           #extract dict containing terms and values
     print(response)
-    input = response["input"]
-    sort1_parameter = response["sort1"]
-    sort2_parameter = response["sort2"]
-    sort1_type = response["sort1_type"]
-    sort2_type = response["sort2_type"]
+    input = response["input"]                                        #extract input from request body
+    sort1_parameter = response["sort1"]                              #extract sort field name from the request body
+    sort2_parameter = response["sort2"]                              #extract sort field name from the request body  
+    sort1_type = response["sort1_type"]                              #extract sorting type from the request body
+    sort2_type = response["sort2_type"]                              #extract sorting type from the request body
     filter_list = []
     for field in field_terms.keys():
         if field == "category":

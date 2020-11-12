@@ -1,6 +1,7 @@
 from elasticsearch import Elasticsearch
 from flask import Flask, jsonify, request
 from elasticsearch import helpers
+import re
 app = Flask(__name__)
 es = Elasticsearch()
 cat_dict = {'General Lab Supplies': '1', 'Pipette Tips': '2', 'Lab Equipments ': '3', 'Cell Culture ': '4', 'Genomics': '5', 'Proteomics': '6', 'Glassware': '7', 'Bottles': '8', 'Multi-well Plate': '9', 'Serological Pipette': '10', 'DNA Electrophoresis': '11', 'PCR ': '12', "Kipp's Apparatus": '13', 'Desiccator': '14', 'Hot Plate': '15', 'Pipette': '16', 'Rotospin': '17', 'Shaker': '18', 'Animal Cage': '19', 'Atomic Model Set Junior': '20', 'Basket': '21', 'Beakers and Carboy': '22', 'Boxes': '23', 'Centrifuge Tubes': '24', 'Clamp and Stand': '25', 'Connector': '26', 'Cooler and Cryoware': '27', 'Energy Regulator': '28', 'Filters': '29', 'Flasks': '30', 'Funnel': '31', 'Gloves': '32', 'Magnetic Bars': '33', 'Measuring Cylinder ': '34', 'Measuring Scoop': '35', 'Membrane Filter': '36', 'Micro-Centrifuge tubes': '37', 'Micro-Test Plate': '38', 'Miscellaneous': '39', 'Petri dish': '40', 'Plant Tissue Culture': '41', 'Microtube rack': '42', 'Reservoir': '43', 'Safety Products': '44', 'Slides': '45', 'Spinix': '46', 'Syphon': '47', 'Test tube Stand': '48', 'Tip box': '49', 'Tips': '50', 'Trays': '51', 'Tubings ': '52', 'Vials': '53', 'Vortex': '54', 'Lab Consumables': '55', 'Container': '56', 'Marker': '57', 'Parafilm': '58', 'Pasteur pipette': '59', 'Tags': '60', 'Tapes':
@@ -14,9 +15,11 @@ brand_dict = {'MP Biomedicals': '1', 'BioPointe Scientific': '2', 'Atgen': '3', 
 def autocomplete():
     response = request.get_json()                       #extract request body
     input = response["input"]                           #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)                               
     res = es.search(index='biomall', body={"query": {
         "query_string": {
-            "query": input}}})      
+            "query": sanitized_input}}})      
     return jsonify(res)
 
 #autocomplete with size 
@@ -24,10 +27,12 @@ def autocomplete():
 def autocomplete_size():
     response = request.get_json()                       #request body extraction
     input = response["input"]                           #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     size = response["size"]                             #extracting size from request body
     res = es.search(index='biomall', body={"query": {
         "query_string": {
-            "query": input}}, "size": size})    
+            "query": sanitized_input}}, "size": size})    
     return jsonify(res)
 
 #autocomplete with hightlight feature-return html-code snippet to highlight 
@@ -35,11 +40,13 @@ def autocomplete_size():
 def autocomplete_highlight():
     requestf = request.get_json()                        #request body extraction
     input = requestf["input"]                            #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     input_field = requestf["input_field"]                #extracting field_name_input from request body
     res = es.search(index='biomall', body={
         "query": {
             "query_string": {
-                "query": input
+                "query": sanitized_input
             }
         },
         "highlight": {
@@ -54,12 +61,14 @@ def autocomplete_highlight():
 def autocomplete_highlight_size():
     requestf = request.get_json()                       #request body extraction
     input = requestf["input"]                           #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     input_field = requestf["input_field"]               #extracting field_name_input from request body
     size = requestf["size"]                             #extractng size from request body
     res = es.search(index='biomall', body={
         "query": {
             "query_string": {
-                "query": input
+                "query": sanitized_input
             }
         },
         "highlight": {
@@ -75,10 +84,12 @@ def autocomplete_highlight_size():
 def search_query_by_string():
     requestf = request.get_json()                       #request body extraction   
     input = requestf["input"]                           #extracting search input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     res = es.search(index='biomall', body={
         "query": {
             "query_string": {
-                "query": input
+                "query": sanitized_input
             }
         }
     })
@@ -89,12 +100,14 @@ def search_query_by_string():
 def search_query_by_string_spellchecker():
     requestf = request.get_json()                       #request body extraction
     input = requestf["input"]                           #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     input_field = requestf["input_field"]               #extracting field_name_input from request body
     res = es.search(index='biomall', body={
         "query": {
             "fuzzy": {
                 input_field: {
-                    "value": "lecd",
+                    "value": sanitized_input,
                     "fuzziness": 4
                 }
             }
@@ -119,6 +132,8 @@ def filter_range():
     print(requestf)
     search_field = requestf["search_field"]             #extracting field_name_input from request body
     input = requestf["input"]                           #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     range_field = requestf["range_field"]               #extracting range field name 
     range_min_val = requestf["range_min_val"]           #extracting minimum value 
     range_max_val = requestf["range_max_val"]           #extracting maximum value 
@@ -126,7 +141,7 @@ def filter_range():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
                     {"range": {range_field: {"gte": range_min_val}}}
@@ -142,6 +157,8 @@ def filter_range_mul():
     requestf = request.get_json()                           #request body extraction
     search_field = requestf["search_field"]                 #extracting field_name_input from request body
     input = requestf["input"]                               #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     range_fields_value = requestf["range_fields_value"]     #extracting range field name and minimum value , maximum value from request body
     filter_list = []
     for range_field in range_fields_value.keys():
@@ -154,7 +171,7 @@ def filter_range_mul():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -167,6 +184,8 @@ def filter_term():
     requestf = request.get_json()                               #request body extraction
     search_field = requestf["search_field"]                     #extracting field_name_input from request body
     search_input = requestf["search_input"]                     #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', search_input)
     filter_term = requestf["filter_term"]                       #extracting filter term field name
     filter_term_name = requestf["filter_term_name"]             #extracting filter term field input
     if filter_term == "category":
@@ -179,7 +198,7 @@ def filter_term():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: search_input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
                     {"term":  {filter_term: filter_term_name}}
@@ -195,6 +214,8 @@ def filter_term_mul():
     requestf = request.get_json()                           #request body extraction
     search_field = requestf["search_field"]                 #extracting field_name_input from request body
     search_input = requestf["search_input"]                 #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', search_input)
     field_terms = requestf["filter_terms"]                  #extracting filter term field name and field input fromr request bodys
     filter_list = []
     for field in field_terms.keys():
@@ -211,7 +232,7 @@ def filter_term_mul():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: search_input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -225,6 +246,8 @@ def filter_range_size():
     print(requestf)
     search_field = requestf["search_field"]             #extracting field_name_input from request body
     input = requestf["input"]                           #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     range_field = requestf["range_field"]               #extracting range field name from request body
     range_min_val = requestf["range_min_val"]           #extracting minimum value for range
     range_max_val = requestf["range_max_val"]           #extracting maximum value for range
@@ -233,7 +256,7 @@ def filter_range_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
                     {"range": {range_field: {"gte": range_min_val}}}
@@ -250,6 +273,8 @@ def filter_range_mul_size():
     size = requestf["size"]                                     #extractng size from request body
     search_field = requestf["search_field"]                     #extracting field_name_input from request body
     input = requestf["input"]                                   #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     range_fields_value = requestf["range_fields_value"]         #range field values extracted from request body, minimum and maximum value
     filter_list = []
     for range_field in range_fields_value.keys():
@@ -263,7 +288,7 @@ def filter_range_mul_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -276,6 +301,8 @@ def filter_term_size():
     requestf = request.get_json()                       #request body extraction
     search_field = requestf["search_field"]             #extracting field_name_input from request body
     search_input = requestf["search_input"]             #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', search_input)
     filter_term = requestf["filter_term"]               #filter field name 
     filter_term_name = requestf["filter_term_name"]     #filtered input according to filter field
     size = requestf["size"]                             #extractng size from request body
@@ -289,7 +316,7 @@ def filter_term_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: search_input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
                     {"term":  {filter_term: filter_term_name}}
@@ -305,6 +332,8 @@ def filter_term_mul_size():
     requestf = request.get_json()           #request body extraction
     search_field = requestf["search_field"] #extracting field_name_input from request body
     search_input = requestf["search_input"] #extracting input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', search_input)
     field_terms = requestf["filter_terms"]  #extracting filter_terms from request body
     filter_list = []
     size = requestf["size"]                 #extractng size from request body
@@ -322,7 +351,7 @@ def filter_term_mul_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: search_input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -374,6 +403,8 @@ def filter_range_sort():
     
     search_field = response["search_field"]                      #extract search field name from request body
     input = response["input"]                                    #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort_parameter = response["sort"]                            #extract sort field name from the request body
     sort_type = response["sort_type"]                            #extract sorting type from request body
     range_fields_value = response["range_field_value"]           #extract dictionary of range value pair from request body
@@ -393,7 +424,7 @@ def filter_range_sort():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -409,6 +440,8 @@ def filter_range_multiple_variable_sort():
     print(response)
     search_field = response["search_field"]              #extract search field name from request body
     input = response["input"]                            #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]                  #extract sort field name from the request body
     sort2_parameter = response["sort2"]                  #extract sort field name from the request body
     sort1_type = response["sort1_type"]                  #extract sorting type from request body
@@ -431,7 +464,7 @@ def filter_range_multiple_variable_sort():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -446,6 +479,8 @@ def filter_term_sort():
     print(response)
     search_field = response["search_field"]               #extract search field name from request body
     input = response["input"]                             #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     term_field = response["term"]                         #extract term field name from the request body
     term_value = response["term_value"]                   #extract term value from the request body
     sort_parameter = response["sort"]                     #extract sort field name from the request body
@@ -464,7 +499,7 @@ def filter_term_sort():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
 
@@ -487,6 +522,8 @@ def filter_multiple_variable_term_sort():
     print(response)
 
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]                      #extract sort field name from the request body
     sort2_parameter = response["sort2"]                      #extract sort field name from the request body
     sort1_type = response["sort1_type"]                      #extract sorting type from request body
@@ -512,7 +549,7 @@ def filter_multiple_variable_term_sort():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -529,6 +566,8 @@ def filter_range_sort_size():
     print(response)
     search_field = response["search_field"]                         #extract search field name from request body
     input = response["input"]                                       #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     size = response["size"]                                         #extract size from request body
 
     sort_parameter = response["sort"]                               #extract sort field name from the request body
@@ -550,7 +589,7 @@ def filter_range_sort_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -568,6 +607,8 @@ def filter_range_multiple_variable_sort_size():
     size = response["size"]                            #extract size from the request body
     search_field = response["search_field"]            #extract search field name from request body
     input = response["input"]                          #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]                #extract sort field name from the request body
     sort2_parameter = response["sort2"]                #extract sort field name from the request body
     sort1_type = response["sort1_type"]                #extract sorting type from the request body
@@ -590,7 +631,7 @@ def filter_range_multiple_variable_sort_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -607,6 +648,8 @@ def filter_term_sort_size():
     size = response["size"]                                    #extract size from the request body          
     search_field = response["search_field"]                    #extract search field name from request body
     input = response["input"]                                  #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     term_field = response["term"]                              #extract term name from the request body
     term_value = response["term_value"]                        #extract term value from the request body
     sort_parameter = response["sort"]                          #extract sort field name from the request body
@@ -625,7 +668,7 @@ def filter_term_sort_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
 
@@ -649,6 +692,8 @@ def filter_multiple_variable_term_sort_size():
     field_terms = response["filter_terms"]                           #extract dict containing terms and values
     print(response)
     input = response["input"]                                        #extract input from request body
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]                              #extract sort field name from the request body
     sort2_parameter = response["sort2"]                              #extract sort field name from the request body  
     sort1_type = response["sort1_type"]                              #extract sorting type from the request body
@@ -675,7 +720,7 @@ def filter_multiple_variable_term_sort_size():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -693,6 +738,8 @@ def filter_range_sort_sponsored():
     print(response)
     search_field = response["search_field"]
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort_parameter = response["sort"]
     sort_type = response["sort_type"]
     range_fields_value = response["range_field_value"]
@@ -713,7 +760,7 @@ def filter_range_sort_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -729,6 +776,8 @@ def filter_range_multiple_variable_sort_sponsored():
     print(response)
     search_field = response["search_field"]
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]
     sort2_parameter = response["sort2"]
     sort1_type = response["sort1_type"]
@@ -752,7 +801,7 @@ def filter_range_multiple_variable_sort_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -767,6 +816,8 @@ def filter_term_sort_sponsored():
     print(response)
     search_field = response["search_field"]
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     term_field = response["term"]
     term_value = response["term_value"]
     sort_parameter = response["sort"]
@@ -786,7 +837,7 @@ def filter_term_sort_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
 
@@ -808,6 +859,8 @@ def filter_multiple_variable_term_sort_sponsored():
     field_terms = response["filter_terms"]
     print(response)
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]
     sort2_parameter = response["sort2"]
     sort1_type = response["sort1_type"]
@@ -835,7 +888,7 @@ def filter_multiple_variable_term_sort_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -852,6 +905,8 @@ def filter_range_sort_size_sponsored():
     print(response)
     search_field = response["search_field"]
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     size = response["size"]
 
     sort_parameter = response["sort"]
@@ -874,7 +929,7 @@ def filter_range_sort_size_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 
@@ -892,6 +947,8 @@ def filter_range_multiple_variable_sort_size_sponsored():
     size = response["size"]
     search_field = response["search_field"]
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]
     sort2_parameter = response["sort2"]
     sort1_type = response["sort1_type"]
@@ -915,7 +972,7 @@ def filter_range_multiple_variable_sort_size_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
             }
@@ -932,6 +989,8 @@ def filter_term_sort_size_sponsored():
     size = response["size"]
     search_field = response["search_field"]
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     term_field = response["term"]
     term_value = response["term_value"]
     sort_parameter = response["sort"]
@@ -951,7 +1010,7 @@ def filter_term_sort_size_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": [
 
@@ -973,8 +1032,10 @@ def filter_multiple_variable_term_sort_size_sponsored():
     size = response["size"]
     search_field = response["search_field"]
     field_terms = response["filter_terms"]
-    print(response)
+    
     input = response["input"]
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)
     sort1_parameter = response["sort1"]
     sort2_parameter = response["sort2"]
     sort1_type = response["sort1_type"]
@@ -1002,7 +1063,7 @@ def filter_multiple_variable_term_sort_size_sponsored():
         "query": {
             "bool": {
                 "must": [
-                    {"match": {search_field: input}}
+                    {"match": {search_field: sanitized_input}}
                 ],
                 "filter": filter_list
 

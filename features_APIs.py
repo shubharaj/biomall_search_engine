@@ -243,7 +243,7 @@ def filter_term_mul():
 @app.route('/filter_range_size', methods=["POST"])
 def filter_range_size():
     requestf = request.get_json()                       #request body extraction
-    print(requestf)
+    
     search_field = requestf["search_field"]             #extracting field_name_input from request body
     input = requestf["input"]                           #extracting input from request body
     pattern = re.compile('\W')
@@ -437,7 +437,7 @@ def filter_range_sort():
 @app.route('/filter_range_multiple_variable_sort', methods=['GET', 'POST'])
 def filter_range_multiple_variable_sort():
     response = request.get_json()
-    print(response)
+    
     search_field = response["search_field"]              #extract search field name from request body
     input = response["input"]                            #extract input from request body
     pattern = re.compile('\W')
@@ -476,7 +476,7 @@ def filter_range_multiple_variable_sort():
 @app.route('/filter_term_sort', methods=['GET', 'POST'])
 def filter_term_sort():
     response = request.get_json()                         #request body extraction
-    print(response)
+    
     search_field = response["search_field"]               #extract search field name from request body
     input = response["input"]                             #extract input from request body
     pattern = re.compile('\W')
@@ -519,7 +519,7 @@ def filter_multiple_variable_term_sort():
     response = request.get_json()                            #request body extraction
     search_field = response["search_field"]                  #extract search field name from request body
     field_terms = response["filter_terms"]                   #extract dict containing terms and values
-    print(response)
+    
 
     input = response["input"]
     pattern = re.compile('\W')
@@ -563,7 +563,7 @@ def filter_multiple_variable_term_sort():
 @app.route('/filter_range_sort_size', methods=['GET', 'POST'])
 def filter_range_sort_size():
     response = request.get_json()                                   #request body extraction
-    print(response)
+    
     search_field = response["search_field"]                         #extract search field name from request body
     input = response["input"]                                       #extract input from request body
     pattern = re.compile('\W')
@@ -603,7 +603,7 @@ def filter_range_sort_size():
 @app.route('/filter_range_multiple_variable_sort_size', methods=['GET', 'POST'])
 def filter_range_multiple_variable_sort_size():
     response = request.get_json()                      #request body extraction
-    print(response)
+    
     size = response["size"]                            #extract size from the request body
     search_field = response["search_field"]            #extract search field name from request body
     input = response["input"]                          #extract input from request body
@@ -644,7 +644,7 @@ def filter_range_multiple_variable_sort_size():
 @app.route('/filter_term_sort_size', methods=['GET', 'POST'])
 def filter_term_sort_size():
     response = request.get_json()                              #request body extraction
-    print(response)                                  
+                                   
     size = response["size"]                                    #extract size from the request body          
     search_field = response["search_field"]                    #extract search field name from request body
     input = response["input"]                                  #extract input from request body
@@ -690,7 +690,7 @@ def filter_multiple_variable_term_sort_size():
     size = response["size"]                                          #extract size from the request body
     search_field = response["search_field"]                          #extract search field name from request body
     field_terms = response["filter_terms"]                           #extract dict containing terms and values
-    print(response)
+    
     input = response["input"]                                        #extract input from request body
     pattern = re.compile('\W')
     sanitized_input = re.sub(pattern, '', input)
@@ -735,7 +735,7 @@ def filter_multiple_variable_term_sort_size():
 @app.route('/filter_range_sort_sponsored', methods=['GET', 'POST'])
 def filter_range_sort_sponsored():
     response = request.get_json()
-    print(response)
+    
     search_field = response["search_field"]
     input = response["input"]
     pattern = re.compile('\W')
@@ -773,7 +773,7 @@ def filter_range_sort_sponsored():
 @app.route('/filter_range_multiple_variable_sort_sponsored', methods=['GET', 'POST'])
 def filter_range_multiple_variable_sort_sponsored():
     response = request.get_json()
-    print(response)
+    
     search_field = response["search_field"]
     input = response["input"]
     pattern = re.compile('\W')
@@ -813,7 +813,7 @@ def filter_range_multiple_variable_sort_sponsored():
 @app.route('/filter_term_sort_sponsored', methods=['GET', 'POST'])
 def filter_term_sort_sponsored():
     response = request.get_json()
-    print(response)
+    
     search_field = response["search_field"]
     input = response["input"]
     pattern = re.compile('\W')
@@ -857,7 +857,7 @@ def filter_multiple_variable_term_sort_sponsored():
     response = request.get_json()
     search_field = response["search_field"]
     field_terms = response["filter_terms"]
-    print(response)
+    
     input = response["input"]
     pattern = re.compile('\W')
     sanitized_input = re.sub(pattern, '', input)
@@ -902,7 +902,7 @@ def filter_multiple_variable_term_sort_sponsored():
 @app.route('/filter_range_sort_size_sponsored', methods=['GET', 'POST'])
 def filter_range_sort_size_sponsored():
     response = request.get_json()
-    print(response)
+    
     search_field = response["search_field"]
     input = response["input"]
     pattern = re.compile('\W')
@@ -943,7 +943,7 @@ def filter_range_sort_size_sponsored():
 @app.route('/filter_range_multiple_variable_sort_size_sponsored', methods=['GET', 'POST'])
 def filter_range_multiple_variable_sort_size_sponsored():
     response = request.get_json()
-    print(response)
+    
     size = response["size"]
     search_field = response["search_field"]
     input = response["input"]
@@ -985,7 +985,7 @@ def filter_range_multiple_variable_sort_size_sponsored():
 @app.route('/filter_term_sort_size_sponsored', methods=['GET', 'POST'])
 def filter_term_sort_size_sponsored():
     response = request.get_json()
-    print(response)
+    
     size = response["size"]
     search_field = response["search_field"]
     input = response["input"]

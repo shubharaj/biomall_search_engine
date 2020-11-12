@@ -119,7 +119,7 @@ def search_query_by_string_spellchecker():
         }
     })
     if len(res['hits']['hits']) >= 1:
-        firstresponse = res['hits']['hits'][0]["hightlight"]["title"][0]
+        firstresponse = res['hits']['hits'][0]["highlight"]["title"][0]
         response = {"suggest": firstresponse, "data": res}
     else:
         response = res
@@ -129,7 +129,7 @@ def search_query_by_string_spellchecker():
 @app.route('/filter_range', methods=["POST"])
 def filter_range():
     requestf = request.get_json()                       #request body extraction
-    print(requestf)
+    
     search_field = requestf["search_field"]             #extracting field_name_input from request body
     input = requestf["input"]                           #extracting input from request body
     pattern = re.compile('\W')
@@ -1074,6 +1074,18 @@ def filter_multiple_variable_term_sort_size_sponsored():
     )
     return (res)
 
+@app.route('/synonym_update', methods=["POST"])
+def synonym_update():
+    requestf = request.get_json()
+    synonym=requestf["synonym"]  
+    file1 = open("/home/anuja/Downloads/elasticsearch-7.9.1/config/analysis/synonym.txt", "a")
+    file1.write("\n") 
+    file1.write(synonym)
+    file1.close()  
+    res=es.transport.perform_request('POST', '/synonym_test7/_reload_search_analyzers')
+    return res
+
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.2', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5000, debug=True)
+

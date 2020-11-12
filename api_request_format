@@ -61,7 +61,7 @@
     "input":"Lead",
     "range_field":"list_price",
     "range_min_val":"200",
-    "range_max_val":"2000",
+    "range_max_val":"20000",
     "size":20
 }
 /filter_range_mul_size
@@ -77,7 +77,7 @@
     "search_field":"category",
     "search_input":"Le",
     "filter_term":"category",
-    "filter_term_name":"Pippets",
+    "filter_term_name":"Pipette",
     "size":20
 }
 /filter_term_mul_size

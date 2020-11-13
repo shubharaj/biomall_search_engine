@@ -273,3 +273,8 @@
 "sort2" : "list_price",
 "size" : 3
 }
+/synonym_update
+{
+"synonym" : "NH3,Ammonia,ammonia"
+}
+

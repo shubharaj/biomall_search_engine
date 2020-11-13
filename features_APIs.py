@@ -1077,13 +1077,21 @@ def filter_multiple_variable_term_sort_size_sponsored():
 @app.route('/synonym_update', methods=["POST"])
 def synonym_update():
     requestf = request.get_json()
-    synonym=requestf["synonym"]  
-    file1 = open("/home/anuja/Downloads/elasticsearch-7.9.1/config/analysis/synonym.txt", "a")
-    file1.write("\n") 
-    file1.write(synonym)
-    file1.close()  
-    res=es.transport.perform_request('POST', '/synonym_test7/_reload_search_analyzers')
-    return res
+    synonym=requestf["synonym"]
+    try:
+        file = open("C:\\Users\\Win10\\Desktop\\elasticsearch-7.9.1\\config\\analysis\\synonym.txt", "a")
+        file.write("\n") 
+        file.write(synonym)
+        file.close()
+    except EOFError as ex:
+        print("Caught the EOF error.")
+        raise ex
+    except IOError as e:
+        print("Caught the I/O error.")
+        raise ex  
+    response=es.transport.perform_request('POST', '/bioindex/_reload_search_analyzers')
+    return response
+
 
 
 if __name__ == '__main__':

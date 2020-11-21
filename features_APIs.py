@@ -10,6 +10,90 @@ brand_dict = {'MP Biomedicals': '1', 'BioPointe Scientific': '2', 'Atgen': '3', 
               'Tarsons': '6', 'Alfa Chemika': '7', 'Ansell': '8', 'Ansell12': '9', 'Kingfisher': '10', 'Test brand shub': '11', 'Biomall': '12'}
 
 
+#Indexing
+@app.route('/create_index', methods=['POST'])
+def create_index():
+    requestf = request.get_json()
+    indexname = requestf["indexname"]
+    mapping = requestf["mapping_property"]
+    request_body = {
+        "settings": {
+            "index": {
+                "analysis": {
+                    "analyzer": {
+                        "synonym_analyzer": {
+                            "tokenizer": "whitespace",
+                            "filter": ["lowercase", "my_synonyms"]
+                        },
+
+                        "autocomplete": {
+                            "tokenizer": "autocomplete",
+                            "filter": ["lowercase"]
+                        }
+                    },
+                    "filter": {
+                        "my_synonyms": {
+                            "type": "synonym",
+                            "synonyms_path": "analysis/synonym.txt",
+                            "updateable": "true"
+                        }
+                    },
+                    "tokenizer": {
+                        "autocomplete": {
+                            "type": "edge_ngram",
+                            "min_gram": 2,
+                            "max_gram": 20,
+                            "token_chars": [
+                                "letter",
+                                "digit"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+    print("creating "+indexname+" index...")
+    es.indices.create(index=indexname, body=request_body)
+    res = es.transport.perform_request(
+        'PUT', '/'+indexname+'/_mappings', body={"properties": mapping})
+    return res
+
+#Bulk update
+@app.route("/bulk_update/<indexname>", methods=['POST'])
+def bulk_update(indexname):
+    bulk_data = dict(xmltodict.parse(request.data))
+    bulk_data = bulk_data["root"]["products"]["product"]
+    print(indexname)
+    for data in bulk_data:
+        res = es.index(index=indexname, id=data["id"], body=data)
+    return "success"
+
+#Delete index
+@app.route("/delete_index", methods=['POST'])
+def delete_index():
+    requestf = request.get_json()
+    indexname = requestf["indexname"]
+    res = es.transport.perform_request(
+        'DELETE', '/'+indexname)
+    return res
+
+#Weight Update
+@app.route("/update_field_value_by_product_id", methods=['POST'])
+def update_field_value_by_product_id():
+    requestf = request.get_json()
+    sponsored_value = requestf["sponsored_value"]
+    id = requestf["id"]
+    indexname = requestf["indexname"]
+    body = {"doc": {"sponsored_value": sponsored_value}}
+    res = es.transport.perform_request(
+        'POST', '/'+indexname+'/_update/'+id, body=body)
+    return res
+
+
+
+
+
 #autocomplete 
 @app.route('/autocomplete', methods=["POST"])
 def autocomplete():

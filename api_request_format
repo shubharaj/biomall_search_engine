@@ -1,0 +1,313 @@
+/autocomplete 
+{
+    "indexname":"biomall"
+    "input":"MP"
+}
+/autocomplete_size
+{
+    "indexname":"biomall"
+    "input":"MP",
+    "size":20
+}
+/autocomplete_hightlight
+{
+    "indexname":"biomall"
+    "input":"MP",
+    "input_field":"brand"
+}
+/autocomplete_hightlight_size
+{
+    "indexname":"biomall"
+    "input":"MP",
+    "input_field":"brand",
+    "size":20
+}
+/search_query_by_string
+{
+    "indexname":"biomall"
+    "input":"Lead"
+}
+/search_query_by_string_spellchecker
+{
+    "indexname":"biomall"
+    "input":"Lecd",
+    "input_field":"title"
+}
+/filter_range
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "input":"Lead",
+    "range_field":"list_price",
+    "range_min_val":"200",
+    "range_max_val":"20000"
+}
+/filter_range_mul
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "input":"Lead",
+    "range_fields":["list_price","rating"],
+    "range_fields_value":{"list_price":{"min_val":"200","max_val":"2000"}}
+}
+/filter_term
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "search_input":"Lead",
+    "filter_term":"category",
+    "filter_term_name":"Pipette Tips"
+}
+/filter_term_mul
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "search_input":"Lead",
+    "filter_terms":{"brand":"MP Biomedicals","cat_id":2}
+}
+/filter_range_size
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "input":"Lead",
+    "range_field":"list_price",
+    "range_min_val":"200",
+    "range_max_val":"20000",
+    "size":20
+}
+/filter_range_mul_size
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "input":"Lead",
+    "range_fields":["list_price","rating"],
+    "range_fields_value":{"list_price":{"min_val":"200","max_val":"20000"}},
+    "size":20
+}
+/filter_term_size
+{
+    "indexname":"biomall"
+    "search_field":"category",
+    "search_input":"Le",
+    "filter_term":"category",
+    "filter_term_name":"Pipette",
+    "size":20
+}
+/filter_term_mul_size
+{
+    "indexname":"biomall"
+    "search_field":"title",
+    "search_input":"Lead",
+    "filter_terms":{"brand":"MP Biomedicals"},
+    "size":20
+}
+/insert_one_product
+{
+  "indexname":"biomall"
+    "data":{
+  "cat_status" : 1,
+          "quantity" : "50 gm",
+          "prod_url" : "lead-vanadate-cas-10099-79-3-50-gm-0520574450",
+          "description" : "MW405.11",
+          "product_status" : 1,
+          "list_price" : 6896.700000000001,
+          "title" : "LEAD VANADATE (CAS # 10099-79-3) 50 gm",
+          "featured_product" : 0,
+          "brand_status" : 1,
+          "brand_id" : 1,
+          "unit" : "Bottle ",
+          "cas" : "10099-79-3",
+          "catalog_no" : "0520574450",
+          "cat_id" : 2,
+          "id" : 308,
+          "p_image" : "product/1.jpg",
+          "category" : "Pipette Tips",
+          "brand" : "MP Biomedicals"
+},
+"id":2300
+}
+/search_by_index_and_id
+{
+
+    "index":"biomall",
+    "id":"T2r5eXUBW_mBwlAKnoql"
+}
+
+/filter_range_sort
+{ 
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
+"sort" : "list_price",
+"sort_type" : "asc"
+}
+/filter_range_multiple_variable_sort
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
+"sort1_type" : "asc",
+"sort1" : "title",
+"sort2_type" : "asc",
+"sort2" : "list_price"
+}
+/filter_term_sort
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"term" : "cat_id",
+"term_value" : 2,
+"sort_type" : "asc",
+"sort" : "title"
+}
+/filter_multiple_variable_term_sort
+{
+"indexname":"biomall"
+"search_field":"title",
+"input":"Lead",
+"filter_terms":{"brand":"MP Biomedicals","category":"Pipette Tips"},
+"sort1_type" : "asc",
+"sort2_type" : "asc",
+"sort1" : "title",
+"sort2" : "list_price"
+}
+/filter_range_sort_size
+{ 
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"size" : 3,
+"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
+"sort" : "list_price",
+"sort_type" : "asc"
+}
+/filter_range_multiple_variable_sort_size
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
+"sort1_type" : "asc",
+"sort1" : "title",
+"sort2_type" : "asc",
+"sort2" : "list_price",
+"size" : 3
+}
+/filter_term_sort_size
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"term" : "cat_id",
+"term_value" : 2,
+"sort_type" : "asc",
+"sort" : "title",
+"size" : 3
+}
+/filter_multiple_variable_term_sort_size
+{
+"indexname":"biomall"
+"search_field":"title",
+"input":"Lead",
+"filter_terms":{"brand_id":1,"cat_id":2},
+"sort1_type" : "asc",
+"sort2_type" : "asc",
+"sort1" : "title",
+"sort2" : "list_price",
+"size" : 3
+}
+/filter_range_sort_sponsored
+{ 
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
+"sort" : "list_price",
+"sort_type" : "asc"
+}
+/filter_range_multiple_variable_sort_sponsored
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
+"sort1_type" : "asc",
+"sort1" : "title",
+"sort2_type" : "asc",
+"sort2" : "list_price"
+}
+/filter_term_sort_sponsored
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"term" : "cat_id",
+"term_value" : 2,
+"sort_type" : "asc",
+"sort" : "title"
+}
+/filter_multiple_variable_term_sort_sponsored
+{
+"indexname":"biomall"
+"search_field":"title",
+"input":"Lead",
+"filter_terms":{"brand_id":1,"cat_id":2},
+"sort1_type" : "asc",
+"sort2_type" : "asc",
+"sort1" : "title",
+"sort2" : "list_price"
+}
+/filter_range_sort_size_sponsored
+{
+"indexname":"biomall" 
+"search_field" : "title",
+"input" : "Lead",
+"size" : 3,
+"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
+"sort" : "list_price",
+"sort_type" : "asc"
+}
+/filter_range_multiple_variable_sort_size_sponsored
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
+"sort1_type" : "asc",
+"sort1" : "title",
+"sort2_type" : "asc",
+"sort2" : "list_price",
+"size" : 3
+}
+/filter_term_sort_size_sponsored
+{
+"indexname":"biomall"
+"search_field" : "title",
+"input" : "Lead",
+"term" : "cat_id",
+"term_value" : 2,
+"sort_type" : "asc",
+"sort" : "title",
+"size" : 3
+}
+/filter_multiple_variable_term_sort_size_sponsored
+{
+"indexname":"biomall"
+"search_field":"title",
+"input":"Lead",
+"filter_terms":{"brand_id":1,"cat_id":2},
+"sort1_type" : "asc",
+"sort2_type" : "asc",
+"sort1" : "title",
+"sort2" : "list_price",
+"size" : 3
+}
+/synonym_update
+{
+"indexname":"biomall"
+"synonym" : "NH3,Ammonia,ammonia"
+}
+

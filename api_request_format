@@ -1,328 +1,163 @@
+/create_index
+{
+    "indexname":"biomall",
+    "mapping_property":{
+        "brand" : {
+         "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "synonym_analyzer"
+          
+        },
+        "brand_id" : {
+          "type" : "keyword"
+        },
+        "brand_status" : {
+          "type" : "keyword"
+        },
+        "cas" : {
+          "type" : "keyword"
+        },
+        "cat_id" : {
+          "type" : "keyword"
+        },
+        "cat_status" : {
+          "type" : "keyword"
+        },
+        "catalog_no" : {
+          "type" : "keyword"
+        },
+        "category" : {
+          "type": "text",
+          "analyzer": "autocomplete",
+        "search_analyzer": "synonym_analyzer"
+        },
+        "description" : {
+          "type" : "keyword"
+        },
+        "featured_product" : {
+          "type" : "keyword"
+        },
+        "id" : {
+          "type" : "keyword"
+        },
+        "list_price" : {
+          "type" : "keyword"
+        },
+        "p_image" : {
+          "type" : "keyword"
+        },
+        "prod_url" : {
+          "type" : "keyword"
+        },
+        "product_status" : {
+          "type" : "keyword"
+        },
+        "title" : {
+        "type": "text",
+        "analyzer": "autocomplete",
+        "search_analyzer": "synonym_analyzer",
+        "fielddata" : "true"
+        },
+        "quantity" : {
+          "type" : "keyword"
+        },
+        "unit" : {
+          "type" : "keyword"
+        },
+        "sponsored_value":{
+          "type": "keyword"
+        }
+      }
+}
+
 /autocomplete 
 {
     "indexname":"biomall"
     "input":"MP"
 }
-/autocomplete_size
-{
-    "indexname":"biomall"
-    "input":"MP",
-    "size":20
-}
-/autocomplete_hightlight
-{
-    "indexname":"biomall"
-    "input":"MP",
-    "input_field":"brand"
-}
-/autocomplete_hightlight_size
-{
-    "indexname":"biomall"
-    "input":"MP",
-    "input_field":"brand",
-    "size":20
-}
-/search_query_by_string
-{
-    "indexname":"biomall"
-    "input":"Lead"
-}
-/search_query_by_string_spellchecker
-{
-    "indexname":"biomall"
-    "input":"Lecd",
-    "input_field":"title"
-}
-/filter_range
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "input":"Lead",
-    "range_field":"list_price",
-    "range_min_val":"200",
-    "range_max_val":"20000"
-}
-/filter_range_mul
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "input":"Lead",
-    "range_fields":["list_price","rating"],
-    "range_fields_value":{"list_price":{"min_val":"200","max_val":"2000"}}
-}
-/filter_term
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "search_input":"Lead",
-    "filter_term":"category",
-    "filter_term_name":"Pipette Tips"
-}
-/filter_term_mul
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "search_input":"Lead",
-    "filter_terms":{"brand":"MP Biomedicals","cat_id":2}
-}
-/filter_range_size
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "input":"Lead",
-    "range_field":"list_price",
-    "range_min_val":"200",
-    "range_max_val":"20000",
-    "size":20
-}
-/filter_range_mul_size
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "input":"Lead",
-    "range_fields":["list_price","rating"],
-    "range_fields_value":{"list_price":{"min_val":"200","max_val":"20000"}},
-    "size":20
-}
-/filter_term_size
-{
-    "indexname":"biomall"
-    "search_field":"category",
-    "search_input":"Le",
-    "filter_term":"category",
-    "filter_term_name":"Pipette",
-    "size":20
-}
-/filter_term_mul_size
-{
-    "indexname":"biomall"
-    "search_field":"title",
-    "search_input":"Lead",
-    "filter_terms":{"brand":"MP Biomedicals"},
-    "size":20
-}
-/insert_one_product
-{
-  "indexname":"biomall"
-    "data":{
-  "cat_status" : 1,
-          "quantity" : "50 gm",
-          "prod_url" : "lead-vanadate-cas-10099-79-3-50-gm-0520574450",
-          "description" : "MW405.11",
-          "product_status" : 1,
-          "list_price" : 6896.700000000001,
-          "title" : "LEAD VANADATE (CAS # 10099-79-3) 50 gm",
-          "featured_product" : 0,
-          "brand_status" : 1,
-          "brand_id" : 1,
-          "unit" : "Bottle ",
-          "cas" : "10099-79-3",
-          "catalog_no" : "0520574450",
-          "cat_id" : 2,
-          "id" : 308,
-          "p_image" : "product/1.jpg",
-          "category" : "Pipette Tips",
-          "brand" : "MP Biomedicals"
-},
-"id":2300
-}
-/search_by_index_and_id
-{
 
-    "index":"biomall",
-    "id":"T2r5eXUBW_mBwlAKnoql"
-}
-
-/filter_range_sort
-{ 
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
-"sort" : "list_price",
-"sort_type" : "asc"
-}
-/filter_range_multiple_variable_sort
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
-"sort1_type" : "asc",
-"sort1" : "title",
-"sort2_type" : "asc",
-"sort2" : "list_price"
-}
-/filter_term_sort
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"term" : "cat_id",
-"term_value" : 2,
-"sort_type" : "asc",
-"sort" : "title"
-}
-/filter_multiple_variable_term_sort
-{
-"indexname":"biomall"
-"search_field":"title",
-"input":"Lead",
-"filter_terms":{"brand":"MP Biomedicals","category":"Pipette Tips"},
-"sort1_type" : "asc",
-"sort2_type" : "asc",
-"sort1" : "title",
-"sort2" : "list_price"
-}
-/filter_range_sort_size
-{ 
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"size" : 3,
-"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
-"sort" : "list_price",
-"sort_type" : "asc"
-}
-/filter_range_multiple_variable_sort_size
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
-"sort1_type" : "asc",
-"sort1" : "title",
-"sort2_type" : "asc",
-"sort2" : "list_price",
-"size" : 3
-}
-/filter_term_sort_size
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"term" : "cat_id",
-"term_value" : 2,
-"sort_type" : "asc",
-"sort" : "title",
-"size" : 3
-}
-/filter_multiple_variable_term_sort_size
-{
-"indexname":"biomall"
-"search_field":"title",
-"input":"Lead",
-"filter_terms":{"brand_id":1,"cat_id":2},
-"sort1_type" : "asc",
-"sort2_type" : "asc",
-"sort1" : "title",
-"sort2" : "list_price",
-"size" : 3
-}
-/filter_range_sort_sponsored
-{ 
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
-"sort" : "list_price",
-"sort_type" : "asc"
-}
-/filter_range_multiple_variable_sort_sponsored
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
-"sort1_type" : "asc",
-"sort1" : "title",
-"sort2_type" : "asc",
-"sort2" : "list_price"
-}
-/filter_term_sort_sponsored
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"term" : "cat_id",
-"term_value" : 2,
-"sort_type" : "asc",
-"sort" : "title"
-}
-/filter_multiple_variable_term_sort_sponsored
-{
-"indexname":"biomall"
-"search_field":"title",
-"input":"Lead",
-"filter_terms":{"brand_id":1,"cat_id":2},
-"sort1_type" : "asc",
-"sort2_type" : "asc",
-"sort1" : "title",
-"sort2" : "list_price"
-}
-/filter_range_sort_size_sponsored
-{
-"indexname":"biomall" 
-"search_field" : "title",
-"input" : "Lead",
-"size" : 3,
-"range_field_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
-"sort" : "list_price",
-"sort_type" : "asc"
-}
-/filter_range_multiple_variable_sort_size_sponsored
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 2000}},
-"sort1_type" : "asc",
-"sort1" : "title",
-"sort2_type" : "asc",
-"sort2" : "list_price",
-"size" : 3
-}
-/filter_term_sort_size_sponsored
-{
-"indexname":"biomall"
-"search_field" : "title",
-"input" : "Lead",
-"term" : "cat_id",
-"term_value" : 2,
-"sort_type" : "asc",
-"sort" : "title",
-"size" : 3
-}
-/filter_multiple_variable_term_sort_size_sponsored
-{
-"indexname":"biomall"
-"search_field":"title",
-"input":"Lead",
-"filter_terms":{"brand_id":1,"cat_id":2},
-"sort1_type" : "asc",
-"sort2_type" : "asc",
-"sort1" : "title",
-"sort2" : "list_price",
-"size" : 3
-}
-
-/filter_range_term_multiple_variable_sort_size_sponsored
+/search
 {
 "indexname":"biomall",
-"search_field" : "title",
+"search_fields" : ["title","category","brand"],
 "input" : "Lead",
-"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
+"range_fields_value":{},
 "filter_terms":{"brand_id":1,"cat_id":2},
-"sort1_type" : "asc",
-"sort1" : "title",
-"sort2_type" : "asc",
-"sort2" : "list_price",
-"size" : 3
-
+"sortlist":[],
+"size" : 3,
+"From": 1
 }
-/synonym_update
+
+/update_field_by_query
 {
-"indexname":"biomall"
-"synonym" : "NH3,Ammonia,ammonia"
+    "indexname":"biomall9",
+    "query":[{"id":"7"}],
+    "update":[{"sponsored_value":"8"}]  
 }
 
+/bulk_update/<indexname>
+<root>
+   <products>
+      <product>
+            <brand>MP Biomedicals</brand>
+            <brand_id>1</brand_id>
+            <brand_status>1</brand_status>
+            <cas>100-02-7</cas>
+            <cat_id>2</cat_id>
+            <cat_status>1</cat_status>
+            <catalog_no>0210246125</catalog_no>
+            <category>Pipette Tips</category>
+            <description>(4-Nitrophenol)Spectro Grade. Purity: 99+%Pale yellow crystals</description>
+            <featured_product>0</featured_product>
+            <id>6</id>
+            <list_price>10689.4</list_price>
+            <p_image>product/1.jpg</p_image>
+            <prod_url>p-nitrophenol-cas-100-02-7-25-gm-0210246125</prod_url>
+            <product_status>1</product_status>
+            <quantity>25 gm</quantity>
+            <title>p-NITROPHENOL (CAS # 100-02-7) 25 gm</title>
+            <unit>Bottle </unit>
+            <sponsored_value>9</sponsored_value>
+      </product>
+      <product>
+            <brand>MP Biomedicals</brand>
+            <brand_id>1</brand_id>
+            <brand_status>1</brand_status>
+            <cas>100-02-7</cas>
+            <cat_id>2</cat_id>
+            <cat_status>1</cat_status>
+            <catalog_no>0210246105</catalog_no>
+            <category>Pipette Tips</category>
+            <description>(4-Nitrophenol)Spectro Grade. Purity: 99+%Pale yellow crystals</description>
+            <featured_product>0</featured_product>
+            <id>7</id>
+            <list_price>3632.65</list_price>
+            <p_image>product/1.jpg</p_image>
+            <prod_url>p-nitrophenol-cas-100-02-7-5-gm-0210246105</prod_url>
+            <product_status>1</product_status>
+            <quantity>5 gm</quantity>
+            <title>p-NITROPHENOL (CAS # 100-02-7) 5 gm</title>
+            <unit>Bottle </unit>
+            <sponsored_value>7</sponsored_value>
+      </product>
+   </products>
+</root>
+
+/get_synonym   # No request body
+
+
+/delete_synonym
+{
+“synonyms” : “NH3, ammonia”
+}
+
+/<indexname>/delete_by_query
+{
+    "indexname": "biomall",
+    "query": [{"id": 7}]
+}
+
+/delete_index
+{
+    "indexname":"biomall"
+}

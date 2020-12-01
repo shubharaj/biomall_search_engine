@@ -305,6 +305,21 @@
 "sort2" : "list_price",
 "size" : 3
 }
+
+/filter_range_term_multiple_variable_sort_size_sponsored
+{
+"indexname":"biomall",
+"search_field" : "title",
+"input" : "Lead",
+"range_fields_value" : {"list_price" : {"min_val" : 200, "max_val" : 20000}},
+"filter_terms":{"brand_id":1,"cat_id":2},
+"sort1_type" : "asc",
+"sort1" : "title",
+"sort2_type" : "asc",
+"sort2" : "list_price",
+"size" : 3
+
+}
 /synonym_update
 {
 "indexname":"biomall"

@@ -15,10 +15,10 @@ brand_dict = {'MP Biomedicals': '1', 'BioPointe Scientific': '2', 'Atgen': '3', 
 # Indexing
 @app.route('/create_index', methods=['POST'])
 def create_index():
-    requestf = request.get_json()
-    indexname = requestf["indexname"]
-    mapping = requestf["mapping_property"]
-    request_body = {
+    requestf = request.get_json()              # extracted the request body
+    indexname = requestf["indexname"]          # extracted the indexname from the request body
+    mapping = requestf["mapping_property"]     # extracted mapping from the request body
+    request_body = {                           # settings which need to be performed is stored in this variable
         "settings": {
             "index": {
                 "analysis": {
@@ -64,11 +64,11 @@ def create_index():
 
 # autocomplete
 @app.route('/<indexname>/autocomplete', methods=["POST"])
-def autocomplete_size(indexname):
-    response = request.get_json()
-    input = response["input"]
+def autocomplete_size(indexname):                                 
+    response = request.get_json()                          # extracted the request body
+    input = response["input"]                              # extracted the input from the request body
     pattern = re.compile('\W')
-    sanitized_input = re.sub(pattern, '', input)
+    sanitized_input = re.sub(pattern, '', input)           # input is passed through sanitization
     if "size" in response.keys():
         size = response["size"]
     else:
@@ -78,28 +78,28 @@ def autocomplete_size(indexname):
             "query": sanitized_input}
 
     },
-        "aggs": {
+        "aggs": {                                          # Facets feature
             "by_brand": {
                 "terms": {"field": "brand_name"}
             },
             "by_category": {
                 "terms": {"field": "category_name"}
             }
-    }, "size": size})
+    }, "size": size})                
     return res
 
 # search
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    response = request.get_json()
-    indexname = response["indexname"]
-    size = response["size"]
-    input = response["input"]
+    response = request.get_json()                          # extracted the request body
+    indexname = response["indexname"]                      # extracted the indexname from the request body
+    size = response["size"]                                # extracted the size from the request body
+    input = response["input"]                              # extracted the input from the request body
     pattern = re.compile('\W')
-    sanitized_input = re.sub(pattern, '', input)
-    range_fields_value = response["range_fields_value"]
-    field_terms = response["filter_terms"]
-    filter_list = []
+    sanitized_input = re.sub(pattern, '', input)           # input went through sanitization
+    range_fields_value = response["range_fields_value"]    # extracted dictionary of range fields and its values
+    field_terms = response["filter_terms"]                 # extracted dictionary of term fields and its values
+    filter_list = []                                       # initialized empty list
     for field in field_terms.keys():
         if field == "category":
             filter_list.append(
@@ -115,8 +115,9 @@ def search():
         print(
             {"range": {range_field: {"gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})
     print(filter_list)
-    sortlist = response["sortlist"]
-    search_fields = response["search_fields"]
+    sortlist = response["sortlist"]                         # extracted dictionary of sort fields and its sorting type
+    search_fields = response["search_fields"]               # extracted fields based on which search will be performed
+    From = repsonse["From"]                                 # extracted "from" 
     search_response = es.search(index=indexname, body={
         "sort": sortlist,
         "query": {
@@ -136,6 +137,7 @@ def search():
                 }
             }
         },
+        "from": From,
         "size": size,
         "suggest": {
             "mytermsuggester1": {
@@ -151,7 +153,7 @@ def search():
                 }
             }
         },
-        "aggs": {
+        "aggs": {                                                 # Facets feature
             "by_brand": {
                 "terms": {"field": "brand_name"}
             },
@@ -185,6 +187,7 @@ def search():
                     }
                 }
             },
+            "from": From,
             "size": size,
             "suggest": {
                 "mytermsuggester1": {
@@ -234,11 +237,11 @@ def search():
 # update field by query
 @app.route("/update_field_by_query", methods=['POST'])
 def update_field_with_query():
-    requestf = request.get_json()
-    indexname = requestf["indexname"]
-    querylist = requestf["query"]
-    updatelist = requestf["update"]
-    query = []
+    requestf = request.get_json()                   # extracted the request body
+    indexname = requestf["indexname"]               # extracted indexname from the request body
+    querylist = requestf["query"]                   # extracted query from the request body
+    updatelist = requestf["update"]                 # extracted updates which need to be performed from the request body
+    query = []                                      # initialized empty list
     for queryfield in querylist:
         query.append({"term": {list(queryfield.keys())[0]: {
                       "value": queryfield[list(queryfield.keys())[0]]}}})
@@ -275,14 +278,14 @@ def update_field_with_query():
 # bulk update
 @app.route("/bulk_update/<indexname>", methods=['POST'])
 def update(indexname):
-    bulk_data_syno = dict(xmltodict.parse(request.data))
+    bulk_data_syno = dict(xmltodict.parse(request.data))                   # converted xml to dictionary
     print(bulk_data_syno["root"].keys())
     if "products" in bulk_data_syno["root"].keys():
         bulk_data = bulk_data_syno["root"]["products"]["product"]
         for data in bulk_data:
             data["list_price"] = float(data["list_price"])
-            data["category_name"] = data["category"]
-            data["brand_name"] = data["brand"]
+            data["category_name"] = data["category"]                       # extraction of category in to new key
+            data["brand_name"] = data["brand"]                             # extraction of brand in to new key
             res = es.index(index=indexname, id=data["id"], body=data)
     print(2)
     if "synonym" in bulk_data_syno["root"].keys():
@@ -317,7 +320,7 @@ def update(indexname):
 # get synonym
 @app.route('/get_synonym', methods=["GET"])
 def get_synonym():
-    path = "C:\\Users\\Win10\\Desktop\\elasticsearch-7.9.1\\config\\analysis\\synonym.txt"
+    path = "C:\\Users\\Win10\\Desktop\\elasticsearch-7.9.1\\config\\analysis\\synonym.txt"         # synonym.txt file path
     with open(path, "r") as f:
         lines = f.readlines()
     return {"synonyms": lines}
@@ -327,9 +330,9 @@ def get_synonym():
 # delete synonym
 @app.route('/delete_synonym', methods=["POST"])
 def delete_synonym():
-    requestf = request.get_json()
-    synonyms = requestf["synonyms"]
-    path = "C:\\Users\\Win10\\Desktop\\elasticsearch-7.9.1\\config\\analysis\\synonym.txt"
+    requestf = request.get_json()                                                         # extraction of request body
+    synonyms = requestf["synonyms"]                                                       # extraction of synonyms which needs to be deleted
+    path = "C:\\Users\\Win10\\Desktop\\elasticsearch-7.9.1\\config\\analysis\\synonym.txt"  # synonym.txt file path
     with open(path, "r") as f:
         lines = f.readlines()
         with open(path, "w") as f:
@@ -343,9 +346,9 @@ def delete_synonym():
 # Delete_by_query
 @app.route("/<indexname>/delete_by_query", methods=['POST'])
 def delete_field_with_query(indexname):
-    requestf = request.get_json()
-    querylist = requestf["query"]
-    query = []
+    requestf = request.get_json()                     # extraction of request body
+    querylist = requestf["query"]                     # extraction of query basis which product description needs to be deleted
+    query = []                                        # initialization of empty list
     for k in querylist:
         query.append({"term":k})
     body = {
@@ -364,8 +367,8 @@ def delete_field_with_query(indexname):
 # Delete Index
 @app.route("/delete_index", methods=['POST'])
 def delete_index():
-    requestf = request.get_json()
-    indexname = requestf["indexname"]
+    requestf = request.get_json()                      # extraction of request body
+    indexname = requestf["indexname"]                  # extraction of indexname from the request body
     res = es.transport.perform_request(
         'DELETE', '/'+indexname)
     return res

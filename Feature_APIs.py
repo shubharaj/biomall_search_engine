@@ -85,8 +85,11 @@ def autocomplete_size(indexname):
             "by_category": {
                 "terms": {"field": "category_name"}
             }
-    }, "size": size})                
+    }, "size": size})
+    res["by_brand"] = res["aggregations"]["by_brand"]["buckets"]   
+    res["by_category"] = res["aggregations"]["by_category"]["buckets"]
     return res
+
 
 # search
 @app.route('/search', methods=['GET', 'POST'])
@@ -230,6 +233,8 @@ def search():
         'POST', '/'+indexname+'/_search', body=body)
     res["search_response"] = search_response
     res["banner_response"] = banner_response
+    res["by_brand"] = res["search_response"]["aggregations"]["by_brand"]["buckets"]
+    res["by_category"] = res["search_response"]["aggregations"]["by_category"]["buckets"]
     return (res)
 
 

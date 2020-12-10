@@ -120,7 +120,7 @@ def search():
     print(filter_list)
     sortlist = response["sortlist"]                         # extracted dictionary of sort fields and its sorting type
     search_fields = response["search_fields"]               # extracted fields based on which search will be performed
-    From = repsonse["From"]                                 # extracted "from" 
+    From = response["From"]                                 # extracted "from" 
     search_response = es.search(index=indexname, body={
         "sort": sortlist,
         "query": {

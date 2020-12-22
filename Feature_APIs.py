@@ -18,6 +18,7 @@ es = Elasticsearch()
 def create_index():
     requestf = request.get_json()              # extracted the request body
     indexname = requestf["indexname"]          # extracted the indexname from the request body
+    synonym_path = requestf["synonym_path"]
     mapping = requestf["mapping_property"]     # extracted mapping from the request body
     request_body = {                           # settings which need to be performed is stored in this variable
         "settings": {
@@ -37,7 +38,7 @@ def create_index():
                     "filter": {
                         "my_synonyms": {
                             "type": "synonym",
-                            "synonyms_path": "analyzers/synonym.txt",
+                            "synonyms_path": synonym_path,
                             "updateable": "true"
                         }
                     },
@@ -106,6 +107,11 @@ def search():
     indexname = response["indexname"]                      # extracted the indexname from the request body
     size = response["size"]                                # extracted the size from the request body
     input = response["input"]                              # extracted the input from the request body
+    From = response["From"]
+    if input == "*":
+        res = es.transport.perform_request(
+            'POST', '/'+indexname+'/_search', body={"size":size, "from":From})
+        return res
     pattern = re.compile('\W')
     sanitized_input = re.sub(pattern, '', input)           # input went through sanitization
     range_fields_value = response["range_fields_value"]    # extracted dictionary of range fields and its values
@@ -126,7 +132,7 @@ def search():
     print(filter_list)
     sortlist = response["sortlist"]                         # extracted dictionary of sort fields and its sorting type
     search_fields = response["search_fields"]               # extracted fields based on which search will be performed
-    From = response["From"]                                 # extracted "from"
+    
     try:
             
         search_response = es.search(index=indexname, body={
@@ -408,7 +414,7 @@ def delete_index():
 @app.after_request
 def after_request(response):
     timestamp = strftime('[%Y-%b-%d %H:%M]')
-    logger.error('%s %s %s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path,request.get_json(), response.status,response.get_json())
+    logger.error('%s %s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status, response.get_json())
     return response
 
 

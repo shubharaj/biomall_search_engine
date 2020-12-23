@@ -128,8 +128,9 @@ def search():
     sortlist = response["sortlist"]                         # extracted dictionary of sort fields and its sorting type
     search_fields = response["search_fields"]               # extracted fields based on which search will be performed
     if input == "*":
-        res = es.transport.perform_request(
-            'POST', '/'+indexname+'/_search', body={"size":size, "from":From, "sort": sortlist, "query": {
+        res_1={}
+        search_res = es.transport.perform_request(
+            'POST', '/'+indexname+'/_search', body={"size": size, "from": From, "sort": sortlist, "query": {
                 "function_score": {
                     "query": {
                         "bool": {
@@ -138,8 +139,31 @@ def search():
                         }
                     }
                 }
+            }, 
+            "aggs": {                                                 # Facets feature
+                "by_brand": {
+                    "terms": {"field": "brand_name"}
+                },
+                "by_category": {
+                    "terms": {"field": "category_name"}
+                }
             }})
-        return res
+        body = {
+            "query": {
+                "bool": {
+                    "must": [
+                        {"match": {"bannercheck": "true"}}                    ]
+                }
+            }
+        }
+        banner_res = es.transport.perform_request(
+            'POST', '/'+indexname+'/_search', body=body)
+        res_1["search_response"] = search_res
+        res_1["banner_response"] = banner_res
+        res_1["by_brand"] = res_1["search_response"]["aggregations"]["by_brand"]["buckets"]
+        res_1["by_category"] = res_1["search_response"]["aggregations"]["by_category"]["buckets"]
+        return (res_1)
+
     pattern = re.compile('\W')
     sanitized_input = re.sub(pattern, '', input)           # input went through sanitization
     

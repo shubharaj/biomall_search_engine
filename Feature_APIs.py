@@ -108,12 +108,7 @@ def search():
     size = response["size"]                                # extracted the size from the request body
     input = response["input"]                              # extracted the input from the request body
     From = response["From"]
-    if input == "*":
-        res = es.transport.perform_request(
-            'POST', '/'+indexname+'/_search', body={"size":size, "from":From})
-        return res
-    pattern = re.compile('\W')
-    sanitized_input = re.sub(pattern, '', input)           # input went through sanitization
+    
     range_fields_value = response["range_fields_value"]    # extracted dictionary of range fields and its values
     field_terms = response["filter_terms"]                 # extracted dictionary of term fields and its values
     filter_list = []                                       # initialized empty list
@@ -132,6 +127,21 @@ def search():
     print(filter_list)
     sortlist = response["sortlist"]                         # extracted dictionary of sort fields and its sorting type
     search_fields = response["search_fields"]               # extracted fields based on which search will be performed
+    if input == "*":
+        res = es.transport.perform_request(
+            'POST', '/'+indexname+'/_search', body={"size":size, "from":From, "sort": sortlist, "query": {
+                "function_score": {
+                    "query": {
+                        "bool": {
+
+                            "filter": filter_list
+                        }
+                    }
+                }
+            }})
+        return res
+    pattern = re.compile('\W')
+    sanitized_input = re.sub(pattern, '', input)           # input went through sanitization
     
     try:
             

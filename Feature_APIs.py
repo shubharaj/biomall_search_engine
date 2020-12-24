@@ -118,7 +118,7 @@ def search():
         elif field == "brand":
             return {"message":"Try 'brand_name' instead of 'brand'","status_code":"400"},400
         else:
-            filter_list.append({"term": {field: field_terms[field]}})
+            filter_list.append({"terms": {field: field_terms[field]}})
     for range_field in range_fields_value.keys():
         filter_list.append({"range": {range_field: {
                            "gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})

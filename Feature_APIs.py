@@ -344,6 +344,8 @@ def update(indexname):
     if "products" in bulk_data_syno["root"].keys():
         bulk_data = bulk_data_syno["root"]["products"]["product"]
         print(bulk_data)
+        if str(type(bulk_data))=="<class 'dict'>" or str(type(bulk_data))=="<class 'collections.OrderedDict'>":
+            bulk_data=[bulk_data]
         for data in bulk_data:
             print(data)
             data["list_price"] = float(data["list_price"])

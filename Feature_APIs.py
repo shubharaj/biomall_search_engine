@@ -1,3 +1,19 @@
+
+Meet
+Hangouts
+
+1 of 1,832
+(no subject)
+Inbox
+
+Srishti Singh
+Attachments
+10:55 PM (10 minutes ago)
+to me
+
+
+Attachments area
+
 from elasticsearch import Elasticsearch,NotFoundError,RequestError
 from flask import Flask, jsonify, request, Blueprint
 from elasticsearch import helpers
@@ -344,8 +360,8 @@ def update(indexname):
             data["category_name"] = data["category"]                       # extraction of category in to new key
             data["brand_name"] = data["brand"]                             # extraction of brand in to new key
             if "seller_product" in data.keys():
-                if str(type(data["seller_product"]))=="<class 'dict'>" or str(type(data["seller_product"]))=="<class 'collections.OrderedDict'>":
-                    data["seller_product"]["product"] =[data["seller_product"]["product"]]
+                if str(type(data["seller_product"]["product"]))=="<class 'dict'>" or str(type(data["seller_product"]["product"]))=="<class 'collections.OrderedDict'>":
+                    data["seller_product"]["product"]=[data["seller_product"]["product"]]
             res = es.index(index=indexname, id=data["id"], body=data)
     if "synonym" in bulk_data_syno["root"].keys():
         synonymlist = bulk_data_syno["root"]["synonym"]["syno"]

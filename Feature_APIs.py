@@ -72,7 +72,7 @@ def autocomplete_size(indexname):
     response = request.get_json()                          # extracted the request body
     input = response["input"]                              # extracted the input from the request body
     pattern = re.compile('\W')
-    sanitized_input = re.sub(pattern, '', input)           # input is passed through sanitization
+    sanitized_input = re.sub(pattern, ' ', input)           # input is passed through sanitization
     if "size" in response.keys():
         size = response["size"] 
         if size <= 0:
@@ -124,7 +124,6 @@ def search():
                            "gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})
         print(
             {"range": {range_field: {"gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})
-    print(filter_list)
     sortlist = response["sortlist"]                         # extracted dictionary of sort fields and its sorting type
     search_fields = response["search_fields"]               # extracted fields based on which search will be performed
     if input == "*":
@@ -165,8 +164,8 @@ def search():
         return (res_1)
 
     pattern = re.compile('\W')
-    sanitized_input = re.sub(pattern, '', input)           # input went through sanitization
-    
+    sanitized_input = re.sub(pattern, ' ', input)           # input went through sanitization
+    print(sanitized_input)
     try:
             
         search_response = es.search(index=indexname, body={
@@ -302,7 +301,6 @@ def update_field_with_query():
         query.append({"term": {list(queryfield.keys())[0]: {
                       "value": queryfield[list(queryfield.keys())[0]]}}})
     update = ""
-    print(querylist)
     for i in range(len(updatelist)):
         if i == len(updatelist)-1:
             update += "ctx._source." + \
@@ -312,8 +310,6 @@ def update_field_with_query():
             update += "ctx._source." + \
                 list(updatefield.keys())[0]+" = '" + \
                 updatelist[i][list(updatelist[i].keys())[0]]+"';"
-    print(query)
-    print(update)
     body = {
         "script": {
             "source": update,
@@ -339,15 +335,11 @@ def update_field_with_query():
 @app.route("/bulk_update/<indexname>", methods=['POST'])
 def update(indexname):
     bulk_data_syno = dict(xmltodict.parse(request.data))                   # converted xml to dictionary
-    print(bulk_data_syno["root"].keys())
-
     if "products" in bulk_data_syno["root"].keys():
         bulk_data = bulk_data_syno["root"]["products"]["product"]
-        print(bulk_data)
         if str(type(bulk_data))=="<class 'dict'>" or str(type(bulk_data))=="<class 'collections.OrderedDict'>":
             bulk_data=[bulk_data]
         for data in bulk_data:
-            print(data)
             data["list_price"] = float(data["list_price"])
             data["category_name"] = data["category"]                       # extraction of category in to new key
             data["brand_name"] = data["brand"]                             # extraction of brand in to new key
@@ -355,7 +347,6 @@ def update(indexname):
                 if str(type(data["seller_product"]))=="<class 'dict'>" or str(type(data["seller_product"]))=="<class 'collections.OrderedDict'>":
                     data["seller_product"]["product"] =[data["seller_product"]["product"]]
             res = es.index(index=indexname, id=data["id"], body=data)
-    
     if "synonym" in bulk_data_syno["root"].keys():
         synonymlist = bulk_data_syno["root"]["synonym"]["syno"]
         try:
@@ -364,7 +355,6 @@ def update(indexname):
             file.write("\n")
             file.write("\n".join(synonymlist))
             file.close()
-            print("done")
         except EOFError as ex:
             print("Caught the EOF error.")
             raise ex
@@ -375,12 +365,8 @@ def update(indexname):
             'POST', '/'+indexname+'/_reload_search_analyzers')
     if "banners" in bulk_data_syno["root"].keys():
         bannerlist = bulk_data_syno["root"]["banners"]["banner"]
-        print(bannerlist)
         for data in bannerlist:
             res = es. index(index=indexname, id=data["id"], body=data)
-        
-
-    
     return "success"
 
 
@@ -453,7 +439,7 @@ def delete_index():
 @app.after_request
 def after_request(response):
     timestamp = strftime('[%Y-%b-%d %H:%M]')
-    logger.error('%s %s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status, response.get_json())
+    logger.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
     return response
 
 

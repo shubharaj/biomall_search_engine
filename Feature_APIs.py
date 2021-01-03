@@ -1,19 +1,3 @@
-
-Meet
-Hangouts
-
-1 of 1,832
-(no subject)
-Inbox
-
-Srishti Singh
-Attachments
-10:55 PM (10 minutes ago)
-to me
-
-
-Attachments area
-
 from elasticsearch import Elasticsearch,NotFoundError,RequestError
 from flask import Flask, jsonify, request, Blueprint
 from elasticsearch import helpers

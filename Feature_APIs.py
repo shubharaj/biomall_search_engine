@@ -351,8 +351,11 @@ def update(indexname):
             data["list_price"] = float(data["list_price"])
             data["category_name"] = data["category"]                       # extraction of category in to new key
             data["brand_name"] = data["brand"]                             # extraction of brand in to new key
+            if "seller_product" in data.keys():
+                if str(type(data["seller_product"]))=="<class 'dict'>" or str(type(data["seller_product"]))=="<class 'collections.OrderedDict'>":
+                    data["seller_product"]["product"] =[data["seller_product"]["product"]]
             res = es.index(index=indexname, id=data["id"], body=data)
-    print(2)
+    
     if "synonym" in bulk_data_syno["root"].keys():
         synonymlist = bulk_data_syno["root"]["synonym"]["syno"]
         try:
@@ -375,9 +378,9 @@ def update(indexname):
         print(bannerlist)
         for data in bannerlist:
             res = es. index(index=indexname, id=data["id"], body=data)
-        print(3)
+        
 
-    print("yes")
+    
     return "success"
 
 

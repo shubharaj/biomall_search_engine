@@ -178,7 +178,9 @@ def search():
                                 {
                                     "multi_match": {
                                         "query": sanitized_input,
-                                        "fields": search_fields
+                                        "fields": search_fields,
+                                        "type":"cross_fields",
+                                        "analyzer":"autocomplete"
                                     }
                                 }
                             ],
@@ -228,7 +230,9 @@ def search():
                                     {
                                         "multi_match": {
                                             "query": suggestWord,
-                                            "fields": search_fields
+                                            "fields": search_fields,
+                                            "type":"cross_fields",
+                                            "analyzer":"autocomplete"
                                         }
                                     }
                                 ],

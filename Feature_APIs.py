@@ -49,7 +49,8 @@ def create_index():
                             "max_gram": 20,
                             "token_chars": [
                                 "letter",
-                                "digit"
+                                "digit",
+                                "symbol"
                             ]
                         }
                     }

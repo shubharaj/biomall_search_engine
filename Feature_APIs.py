@@ -121,6 +121,8 @@ def search():
     # extracted the input from the request body
     input = response["input"]
     From = response["From"]
+    banner_size = response["banner_size"]
+    banner_from = response["banner_from"]
 
     # extracted dictionary of range fields and its values
     range_fields_value = response["range_fields_value"]
@@ -170,7 +172,9 @@ def search():
                     "must": [
                         {"match": {"bannercheck": "true"}}]
                 }
-            }
+            },
+            "size": banner_size,
+            "from": banner_from
         }
         banner_res = es.transport.perform_request(
             'POST', '/'+indexname+'/_search', body=body)
@@ -242,7 +246,9 @@ def search():
                             {"match": {"banner_keyword": banner_keyword}}
                         ]
                     }
-                }
+                },
+                "size": banner_size,
+                "from": banner_from
             }
             banner_response = es.transport.perform_request(
                 'POST', '/'+indexname+'/_search', body=body)
@@ -307,7 +313,9 @@ def search():
                         {"match": {"banner_keyword": banner_keyword}}
                     ]
                 }
-            }
+            },
+            "size": banner_size,
+            "from": banner_from
         }
         banner_response = es.transport.perform_request(
             'POST', '/'+indexname+'/_search', body=body)
@@ -485,7 +493,8 @@ def delete_index():
 @app.after_request
 def after_request(response):
     timestamp = strftime('[%Y-%b-%d %H:%M]')
-    logger.error('%s %s %s %s %s %s', timestamp, request.remote_addr, request.method, request.scheme, request.full_path, response.status)
+    logger.error('%s %s %s %s %s %s', timestamp, request.remote_addr,
+                 request.method, request.scheme, request.full_path, response.status)
     return response
 
 

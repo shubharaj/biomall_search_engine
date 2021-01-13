@@ -402,7 +402,7 @@ def update(indexname):
         try:
             file = open(
                 "C:\\Users\\91979\\Desktop\\python\\Folder\\elasticsearch-7.9.2-windows-x86_64\\elasticsearch-7.9.2\\config\\analyzers\\synonym.txt", "a")
-            file.write("\n")
+            
             file.write("\n".join(synonymlist))
             file.close()
         except EOFError as ex:

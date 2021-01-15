@@ -427,9 +427,14 @@ def update(indexname):
 def get_synonym():
     requestf = request.get_json()                   # extracted the request body
     path = requestf["path"]         # synonym.txt file path
+    lines_final=[]
     with open(path, "r") as f:
         lines = f.readlines()
-    return {"synonyms": lines}
+        for line in lines:
+            syno=line.strip('\n')
+            if syno !="":
+                lines_final.append(syno)
+    return {"synonyms": lines_final}
 
 
 # delete synonym

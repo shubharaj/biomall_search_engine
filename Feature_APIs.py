@@ -8,10 +8,13 @@ import logging
 from logging.handlers import RotatingFileHandler
 from time import strftime
 import traceback
+import pysftp
+import config
+
+
 
 app = Flask(__name__)
-es = Elasticsearch()
-
+es = Elasticsearch([{"host":"139.59.72.86","port":9200}],timeout=100)
 
 # Indexing
 @app.route('/create_index', methods=['POST'])
@@ -401,10 +404,16 @@ def update(indexname):
             synonymlist = [synonymlist]
         try:
             file = open(
-                "C:\\Users\\91979\\Desktop\\python\\Folder\\elasticsearch-7.9.2-windows-x86_64\\elasticsearch-7.9.2\\config\\analyzers\\synonym.txt", "a")
+                "synonym.txt", "a")
             file.write("\n")
             file.write("\n".join(synonymlist))
             file.close()
+            
+            with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
+                print("Connection succesfully stablished ... ")
+                localFilePath = 'synonym.txt'
+                remoteFilePath = '/etc/elasticsearch/analyzers/synonym.txt'
+                sftp.put(localFilePath, remoteFilePath)
         except EOFError as ex:
             print("Caught the EOF error.")
             raise ex
@@ -426,7 +435,7 @@ def update(indexname):
 @app.route('/get_synonym', methods=["POST"])
 def get_synonym():
     requestf = request.get_json()                   # extracted the request body
-    path = requestf["path"]         # synonym.txt file path
+    path="synonym.txt"
     lines_final=[]
     with open(path, "r") as f:
         lines = f.readlines()
@@ -444,7 +453,7 @@ def delete_synonym():
     requestf = request.get_json()
     # extraction of synonyms which needs to be deleted
     synonyms = requestf["synonyms"]
-    path = requestf["path"]  # synonym.txt file path
+    path = "synonym.txt"  # synonym.txt file path
     with open(path, "r") as f:
         lines = f.readlines()
         with open(path, "w") as f:
@@ -452,6 +461,11 @@ def delete_synonym():
                 # print(line.strip("\n").lower())
                 if line.strip("\n").lower() != synonyms.lower():
                     f.write(line)
+    with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
+                print("Connection succesfully stablished ... ")
+                localFilePath = 'synonym.txt'
+                remoteFilePath = '/etc/elasticsearch/analyzers/synonym.txt'
+                sftp.put(localFilePath, remoteFilePath)
     return {"message": "Successfully Deleted"}
 
 

@@ -432,7 +432,7 @@ def update(indexname):
 
 
 # get synonym
-@app.route('/get_synonym', methods=["POST"])
+@app.route('/get_synonym', methods=["GET"])
 def get_synonym():
     requestf = request.get_json()                   # extracted the request body
     path="synonym.txt"

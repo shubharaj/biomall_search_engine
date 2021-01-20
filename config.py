@@ -1,3 +1,3 @@
-myHostname = "139.59.72.86"
+myHostname = "XXX.XX.XX.XX"
 myUsername = "root"
-myPassword = "bio123@Search"
+myPassword = "XXXXXXXXXXXX"

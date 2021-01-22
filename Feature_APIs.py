@@ -14,7 +14,7 @@ import config
 
 
 app = Flask(__name__)
-es = Elasticsearch([{"host":"139.59.72.86","port":9200}],timeout=100)
+es = Elasticsearch([{"host":config.elasticIp,"port":config.elasticPort}],timeout=100)
 
 # Indexing
 @app.route('/create_index', methods=['POST'])
@@ -22,7 +22,7 @@ def create_index():
     requestf = request.get_json()              # extracted the request body
     # extracted the indexname from the request body
     indexname = requestf["indexname"]
-    synonym_path = requestf["synonym_path"]
+    synonym_path = config.synonymPath
     # extracted mapping from the request body
     mapping = requestf["mapping_property"]
     request_body = {                           # settings which need to be performed is stored in this variable
@@ -408,11 +408,11 @@ def update(indexname):
             file.write("\n")
             file.write("\n".join(synonymlist))
             file.close()
-            
+
             with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
                 print("Connection succesfully stablished ... ")
                 localFilePath = 'synonym.txt'
-                remoteFilePath = '/etc/elasticsearch/analyzers/synonym.txt'
+                remoteFilePath = config.synonymPath
                 sftp.put(localFilePath, remoteFilePath)
         except EOFError as ex:
             print("Caught the EOF error.")
@@ -464,7 +464,7 @@ def delete_synonym():
     with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
                 print("Connection succesfully stablished ... ")
                 localFilePath = 'synonym.txt'
-                remoteFilePath = '/etc/elasticsearch/analyzers/synonym.txt'
+                remoteFilePath = config.synonymPath
                 sftp.put(localFilePath, remoteFilePath)
     return {"message": "Successfully Deleted"}
 
@@ -522,4 +522,4 @@ if __name__ == '__main__':
     logger = logging.getLogger('tdm')
     logger.setLevel(logging.ERROR)
     logger.addHandler(handler)
-    app.run(host='127.0.0.2', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

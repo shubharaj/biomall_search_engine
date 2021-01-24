@@ -15,7 +15,7 @@ import config
 
 app = Flask(__name__)
 es = Elasticsearch([{"host":config.elasticIp,"port":config.elasticPort}],timeout=100)
-
+# es = Elasticsearch()
 # Indexing
 @app.route('/create_index', methods=['POST'])
 def create_index():
@@ -50,8 +50,8 @@ def create_index():
                     "tokenizer": {
                         "autocomplete": {
                             "type": "edge_ngram",
-                            "min_gram": 2,
-                            "max_gram": 20,
+                            "min_gram": 1,
+                            "max_gram": 70,
                             "token_chars": [
                                 "letter",
                                 "digit",
@@ -190,7 +190,6 @@ def search():
     # input went through sanitization
     sanitized_input = re.sub(pattern, ' ', input)
     try:
-
         search_response = es.search(index=indexname, body={
             "sort": sortlist,
             "query": {
@@ -246,7 +245,7 @@ def search():
                     "bool": {
                         "must": [
                             {"match": {"bannercheck": "true"}},
-                            {"match": {"banner_keyword": banner_keyword}}
+                            {"match": {"banner_keyword": sanitized_input}}
                         ]
                     }
                 },
@@ -255,6 +254,22 @@ def search():
             }
             banner_response = es.transport.perform_request(
                 'POST', '/'+indexname+'/_search', body=body)
+            body_null = {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"match": {"bannercheck": "true"}},
+                            {"match": {"banner_keyword": "null"}}
+                        ]
+                    }
+                },
+                "size": banner_size,
+                "from": banner_from
+            }
+            banner_response_null = es.transport.perform_request(
+                'POST', '/'+indexname+'/_search', body=body_null)
+            banner_response["hits"]["hits"]=banner_response["hits"]["hits"]+banner_response_null["hits"]["hits"]
+
             return {"Results": [], "banner_response": banner_response}, 404
         elif search_response["hits"]["total"]["value"] == 0 and len(search_response["suggest"]["mytermsuggester1"]) != 0:
             suggestWord = search_response["suggest"]["mytermsuggester1"][0]["options"][0]["text"]
@@ -307,6 +322,7 @@ def search():
             )
             suggestWord = "Did you mean "+suggestWord+" ?"
             res["suggestWord"] = suggestWord
+            sanitized_input=suggestWord
         banner_keyword = sanitized_input
         body = {
             "query": {
@@ -322,6 +338,21 @@ def search():
         }
         banner_response = es.transport.perform_request(
             'POST', '/'+indexname+'/_search', body=body)
+        body_null = {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {"match": {"bannercheck": "true"}},
+                            {"match": {"banner_keyword": "null"}}
+                        ]
+                    }
+                },
+                "size": banner_size,
+                "from": banner_from
+            }
+        banner_response_null = es.transport.perform_request(
+                'POST', '/'+indexname+'/_search', body=body_null)
+        banner_response["hits"]["hits"]=banner_response["hits"]["hits"]+banner_response_null["hits"]["hits"]
         res["search_response"] = search_response
         res["banner_response"] = banner_response
         res["by_brand"] = res["search_response"]["aggregations"]["by_brand"]["buckets"]
@@ -427,6 +458,8 @@ def update(indexname):
         if str(type(bannerlist)) == "<class 'dict'>" or str(type(bannerlist)) == "<class 'collections.OrderedDict'>":
             bannerlist = [bannerlist]
         for data in bannerlist:
+            if data["banner_keyword"] is None:
+                data["banner_keyword"]="null"
             res = es. index(index=indexname, id=data["id"], body=data)
     return "success"
 

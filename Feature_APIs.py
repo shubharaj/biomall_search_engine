@@ -1,3 +1,22 @@
+
+Meet
+Hangouts
+
+1 of 1,862
+(no subject)
+Inbox
+
+Srishti Singh
+Attachments
+9:50 PM (9 minutes ago)
+
+to me
+
+https://www.getpostman.com/collections/784dc207db2ea906c969
+
+Attachments area
+
+
 from elasticsearch import Elasticsearch, NotFoundError, RequestError
 from flask import Flask, jsonify, request, Blueprint
 from elasticsearch import helpers
@@ -22,8 +41,7 @@ def create_index():
     requestf = request.get_json()              # extracted the request body
     # extracted the indexname from the request body
     indexname = requestf["indexname"]
-    synonym_path = config.synonymPath
-    # extracted mapping from the request body
+    synonym_path = requestf["synonym_path"]    # extracted mapping from the request body
     mapping = requestf["mapping_property"]
     request_body = {                           # settings which need to be performed is stored in this variable
         "settings": {
@@ -55,7 +73,8 @@ def create_index():
                             "token_chars": [
                                 "letter",
                                 "digit",
-                                "symbol"
+                                "symbol",
+                                "dash_punctuation"
                             ]
                         }
                     }
@@ -322,7 +341,6 @@ def search():
             )
             suggestWord = "Did you mean "+suggestWord+" ?"
             res["suggestWord"] = suggestWord
-            sanitized_input=suggestWord
         banner_keyword = sanitized_input
         body = {
             "query": {

@@ -1,22 +1,3 @@
-
-Meet
-Hangouts
-
-1 of 1,862
-(no subject)
-Inbox
-
-Srishti Singh
-Attachments
-9:50 PM (9 minutes ago)
-
-to me
-
-https://www.getpostman.com/collections/784dc207db2ea906c969
-
-Attachments area
-
-
 from elasticsearch import Elasticsearch, NotFoundError, RequestError
 from flask import Flask, jsonify, request, Blueprint
 from elasticsearch import helpers

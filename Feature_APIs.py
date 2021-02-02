@@ -276,7 +276,9 @@ def search():
             }
             banner_response_null = es.transport.perform_request(
                 'POST', '/'+indexname+'/_search', body=body_null)
-            banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
+            print(banner_response)
+            if banner_response["hits"]["total"]["value"]==0:
+                banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
                 banner_response_null["hits"]["hits"]
 
             return {"Results": [], "banner_response": banner_response}, 404
@@ -360,8 +362,11 @@ def search():
         }
         banner_response_null = es.transport.perform_request(
             'POST', '/'+indexname+'/_search', body=body_null)
-        banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
+        print(banner_response)
+        if banner_response["hits"]["total"]["value"]==0:
+            banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
             banner_response_null["hits"]["hits"]
+
         res["search_response"] = search_response
         res["banner_response"] = banner_response
         res["by_brand"] = res["search_response"]["aggregations"]["by_brand"]["buckets"]
@@ -443,8 +448,7 @@ def update(indexname):
         if str(type(synonymlist)) == "<class 'str'>":
             synonymlist = [synonymlist]
         try:
-            file = open(
-                "synonym.txt", "a")
+            file = open("synonym.txt", "a")
             file.write("\n")
             file.write("\n".join(synonymlist))
             file.close()

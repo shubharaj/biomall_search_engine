@@ -24,7 +24,7 @@ def create_index():
     # extracted the indexname from the request body
     indexname = requestf["indexname"]
     # extracted mapping from the request body
-    synonym_path = requestf["synonym_path"]
+    synonym_path = config.synonymPath
     mapping = requestf["mapping_property"]
     request_body = {                           # settings which need to be performed is stored in this variable
         "settings": {

@@ -12,17 +12,19 @@ import pysftp
 import config
 
 
-
 app = Flask(__name__)
 es = Elasticsearch([{"host":config.elasticIp,"port":config.elasticPort}],timeout=100)
 # es = Elasticsearch()
 # Indexing
+
+
 @app.route('/create_index', methods=['POST'])
 def create_index():
     requestf = request.get_json()              # extracted the request body
     # extracted the indexname from the request body
     indexname = requestf["indexname"]
-    synonym_path = requestf["synonym_path"]    # extracted mapping from the request body
+    # extracted mapping from the request body
+    synonym_path = requestf["synonym_path"]
     mapping = requestf["mapping_property"]
     request_body = {                           # settings which need to be performed is stored in this variable
         "settings": {
@@ -37,6 +39,10 @@ def create_index():
                         "autocomplete": {
                             "tokenizer": "autocomplete",
                             "filter": ["lowercase"]
+                        },
+                        "hyphen_cas":{
+                            "tokenizer":"whitespace",
+                            "filter":["lowercase", "stop", "my_word_delimiter"]
                         }
                     },
                     "filter": {
@@ -44,20 +50,23 @@ def create_index():
                             "type": "synonym",
                             "synonyms_path": synonym_path,
                             "updateable": "true"
+                        },
+                        "my_word_delimiter": {
+                            "type": "word_delimiter",
+                            "preserve_original": "true"
                         }
                     },
                     "tokenizer": {
                         "autocomplete": {
-                            "type": "edge_ngram",
-                            "min_gram": 1,
-                            "max_gram": 70,
-                            "token_chars": [
+                        "type": "edge_ngram",
+                        "min_gram": 1,
+                        "max_gram": 70,
+                        "token_chars": [
                                 "letter",
                                 "digit",
-                                "symbol",
-                                "dash_punctuation"
-                            ]
-                        }
+                                "symbol"
+                        ]
+                    }
                     }
                 }
             }
@@ -202,7 +211,6 @@ def search():
                                         "query": sanitized_input,
                                         "fields": search_fields,
                                         "type": "cross_fields"
-
                                     }
                                 }
                             ],
@@ -268,7 +276,8 @@ def search():
             }
             banner_response_null = es.transport.perform_request(
                 'POST', '/'+indexname+'/_search', body=body_null)
-            banner_response["hits"]["hits"]=banner_response["hits"]["hits"]+banner_response_null["hits"]["hits"]
+            banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
+                banner_response_null["hits"]["hits"]
 
             return {"Results": [], "banner_response": banner_response}, 404
         elif search_response["hits"]["total"]["value"] == 0 and len(search_response["suggest"]["mytermsuggester1"]) != 0:
@@ -338,20 +347,21 @@ def search():
         banner_response = es.transport.perform_request(
             'POST', '/'+indexname+'/_search', body=body)
         body_null = {
-                "query": {
-                    "bool": {
-                        "must": [
-                            {"match": {"bannercheck": "true"}},
-                            {"match": {"banner_keyword": "null"}}
-                        ]
-                    }
-                },
-                "size": banner_size,
-                "from": banner_from
-            }
+            "query": {
+                "bool": {
+                    "must": [
+                        {"match": {"bannercheck": "true"}},
+                        {"match": {"banner_keyword": "null"}}
+                    ]
+                }
+            },
+            "size": banner_size,
+            "from": banner_from
+        }
         banner_response_null = es.transport.perform_request(
-                'POST', '/'+indexname+'/_search', body=body_null)
-        banner_response["hits"]["hits"]=banner_response["hits"]["hits"]+banner_response_null["hits"]["hits"]
+            'POST', '/'+indexname+'/_search', body=body_null)
+        banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
+            banner_response_null["hits"]["hits"]
         res["search_response"] = search_response
         res["banner_response"] = banner_response
         res["by_brand"] = res["search_response"]["aggregations"]["by_brand"]["buckets"]
@@ -458,7 +468,7 @@ def update(indexname):
             bannerlist = [bannerlist]
         for data in bannerlist:
             if data["banner_keyword"] is None:
-                data["banner_keyword"]="null"
+                data["banner_keyword"] = "null"
             res = es. index(index=indexname, id=data["id"], body=data)
     return "success"
 
@@ -467,13 +477,13 @@ def update(indexname):
 @app.route('/get_synonym', methods=["GET"])
 def get_synonym():
     requestf = request.get_json()                   # extracted the request body
-    path="synonym.txt"
-    lines_final=[]
+    path = "synonym.txt"
+    lines_final = []
     with open(path, "r") as f:
         lines = f.readlines()
         for line in lines:
-            syno=line.strip('\n')
-            if syno !="":
+            syno = line.strip('\n')
+            if syno != "":
                 lines_final.append(syno)
     return {"synonyms": lines_final}
 
@@ -494,10 +504,10 @@ def delete_synonym():
                 if line.strip("\n").lower() != synonyms.lower():
                     f.write(line)
     with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
-                print("Connection succesfully stablished ... ")
-                localFilePath = 'synonym.txt'
-                remoteFilePath = config.synonymPath
-                sftp.put(localFilePath, remoteFilePath)
+        print("Connection succesfully stablished ... ")
+        localFilePath = 'synonym.txt'
+        remoteFilePath = config.synonymPath
+        sftp.put(localFilePath, remoteFilePath)
     return {"message": "Successfully Deleted"}
 
 

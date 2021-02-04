@@ -9,7 +9,7 @@ from logging.handlers import RotatingFileHandler
 from time import strftime
 import traceback
 import pysftp
-import config
+import config,os
 
 
 app = Flask(__name__)
@@ -32,22 +32,30 @@ def create_index():
                 "analysis": {
                     "analyzer": {
                         "synonym_analyzer": {
-                            "tokenizer": "whitespace",
+                            "tokenizer": "standard",
                             "filter": ["lowercase", "my_synonyms"]
                         },
 
                         "autocomplete": {
                             "tokenizer": "autocomplete",
-                            "filter": ["lowercase"]
+                            "filter": ["lowercase", "my_word_delimiter"]
                         },
-                        "hyphen_cas":{
-                            "tokenizer":"whitespace",
-                            "filter":["lowercase", "stop", "my_word_delimiter"]
+                        "hyphen_cas": {
+                            "tokenizer": "keyword",
+                            "filter": ["lowercase", "stop", "my_word_delimiter"]
+                        }
+                    },
+                    "normalizer": {
+                        "my_normalizer": {
+                            "type": "custom",
+                            "char_filter": [],
+                            "filter": ["lowercase", "asciifolding"]
                         }
                     },
                     "filter": {
                         "my_synonyms": {
-                            "type": "synonym",
+                            "type": "synonym_graph",
+                            "lenient": "true",
                             "synonyms_path": synonym_path,
                             "updateable": "true"
                         },
@@ -58,15 +66,16 @@ def create_index():
                     },
                     "tokenizer": {
                         "autocomplete": {
-                        "type": "edge_ngram",
-                        "min_gram": 1,
-                        "max_gram": 70,
-                        "token_chars": [
+
+                            "type": "edge_ngram",
+                            "min_gram": 1,
+                            "max_gram": 70,
+                            "token_chars": [
                                 "letter",
                                 "digit",
                                 "symbol"
-                        ]
-                    }
+                            ]
+                        }
                     }
                 }
             }
@@ -107,10 +116,10 @@ def autocomplete_size(indexname):
         },
             "aggs": {                                          # Facets feature
                 "by_brand": {
-                    "terms": {"field": "brand_name"}
+                    "terms": {"field": "brand_name", "size": 1000}
                 },
                 "by_category": {
-                    "terms": {"field": "category_name"}
+                    "terms": {"field": "category_name", "size": 1000}
                 }
         }, "size": size})
         res["by_brand"] = res["aggregations"]["by_brand"]["buckets"]
@@ -172,10 +181,10 @@ def search():
             },
                 "aggs": {                                                 # Facets feature
                 "by_brand": {
-                    "terms": {"field": "brand_name"}
+                    "terms": {"field": "brand_name", "size": 1000}
                 },
                 "by_category": {
-                    "terms": {"field": "category_name"}
+                    "terms": {"field": "category_name", "size": 1000}
                 }
             }})
         body = {
@@ -210,7 +219,8 @@ def search():
                                     "multi_match": {
                                         "query": sanitized_input,
                                         "fields": search_fields,
-                                        "type": "cross_fields"
+                                        "type": "cross_fields",
+                                        "minimum_should_match": "60%"
                                     }
                                 }
                             ],
@@ -237,10 +247,10 @@ def search():
             },
             "aggs": {                                                 # Facets feature
                 "by_brand": {
-                    "terms": {"field": "brand_name"}
+                    "terms": {"field": "brand_name", "size": 1000}
                 },
                 "by_category": {
-                    "terms": {"field": "category_name"}
+                    "terms": {"field": "category_name", "size": 1000}
                 }
             }
         }
@@ -276,8 +286,10 @@ def search():
             }
             banner_response_null = es.transport.perform_request(
                 'POST', '/'+indexname+'/_search', body=body_null)
-            banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
-                banner_response_null["hits"]["hits"]
+            print(banner_response)
+            if banner_response["hits"]["total"]["value"] == 0:
+                banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
+                    banner_response_null["hits"]["hits"]
 
             return {"Results": [], "banner_response": banner_response}, 404
         elif search_response["hits"]["total"]["value"] == 0 and len(search_response["suggest"]["mytermsuggester1"]) != 0:
@@ -293,7 +305,8 @@ def search():
                                         "multi_match": {
                                             "query": suggestWord,
                                             "fields": search_fields,
-                                            "type": "cross_fields"
+                                            "type": "cross_fields",
+                                            "minimum_should_match": "60%"
 
                                         }
                                     }
@@ -321,10 +334,10 @@ def search():
                 },
                 "aggs": {
                     "by_brand": {
-                        "terms": {"field": "brand_name"}
+                        "terms": {"field": "brand_name", "size": 1000}
                     },
                     "by_category": {
-                        "terms": {"field": "category_name"}
+                        "terms": {"field": "category_name", "size": 1000}
                     }
                 }
             }
@@ -360,8 +373,11 @@ def search():
         }
         banner_response_null = es.transport.perform_request(
             'POST', '/'+indexname+'/_search', body=body_null)
-        banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
-            banner_response_null["hits"]["hits"]
+        print(banner_response)
+        if banner_response["hits"]["total"]["value"] == 0:
+            banner_response["hits"]["hits"] = banner_response["hits"]["hits"] + \
+                banner_response_null["hits"]["hits"]
+
         res["search_response"] = search_response
         res["banner_response"] = banner_response
         res["by_brand"] = res["search_response"]["aggregations"]["by_brand"]["buckets"]
@@ -495,6 +511,7 @@ def delete_synonym():
     requestf = request.get_json()
     # extraction of synonyms which needs to be deleted
     synonyms = requestf["synonyms"]
+    indexname=requestf["path"]
     path = "synonym.txt"  # synonym.txt file path
     with open(path, "r") as f:
         lines = f.readlines()
@@ -503,6 +520,8 @@ def delete_synonym():
                 # print(line.strip("\n").lower())
                 if line.strip("\n").lower() != synonyms.lower():
                     f.write(line)
+    response = es.transport.perform_request(
+            'POST', '/'+indexname+'/_reload_search_analyzers')
     with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
         print("Connection succesfully stablished ... ")
         localFilePath = 'synonym.txt'
@@ -546,6 +565,15 @@ def delete_index():
     try:
         res = es.transport.perform_request(
             'DELETE', '/'+indexname)
+        raw = open("synonym.txt", "w")
+        raw.seek(0)                        # <- This is the missing piece
+        raw.truncate()
+        raw.close()
+        with pysftp.Connection(host=config.myHostname, username=config.myUsername, password=config.myPassword) as sftp:
+                print("Connection succesfully stablished ... ")
+                localFilePath = 'synonym.txt'
+                remoteFilePath = config.synonymPath
+                sftp.put(localFilePath, remoteFilePath)
         return {"message": "Successfully Deleted!", "response": res}, "200"
     except NotFoundError as es1:
         return es1.info, es1.status_code

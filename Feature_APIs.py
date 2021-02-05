@@ -38,7 +38,7 @@ def create_index():
 
                         "autocomplete": {
                             "tokenizer": "autocomplete",
-                            "filter": ["lowercase", "my_word_delimiter"]
+                            "filter": ["lowercase"]
                         },
                         "hyphen_cas": {
                             "tokenizer": "keyword",

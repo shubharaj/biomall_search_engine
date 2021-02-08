@@ -120,10 +120,14 @@ def autocomplete_size(indexname):
                 },
                 "by_category": {
                     "terms": {"field": "category_name", "size": 1000}
+                },
+                "by_packsize": {
+                    "terms": {"field": "pack_size", "size": 1000}
                 }
         }, "size": size})
         res["by_brand"] = res["aggregations"]["by_brand"]["buckets"]
         res["by_category"] = res["aggregations"]["by_category"]["buckets"]
+        res["by_packsize"] = res["aggregations"]["by_packsize"]["buckets"]
         return res
     except NotFoundError as es1:
         return es1.info, es1.status_code
@@ -157,11 +161,11 @@ def search():
             return {"message": "Try 'brand_name' instead of 'brand'", "status_code": "400"}, 400
         else:
             filter_list.append({"terms": {field: field_terms[field]}})
-    for range_field in range_fields_value.keys():
-        filter_list.append({"range": {range_field: {
-                           "gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})
-        print(
-            {"range": {range_field: {"gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})
+    for range_field in range_fields_value:
+        filter_list.append({"range": range_field})
+        
+        # filter_list.append({"range": {range_field: {
+        #                    "gte": range_fields_value[range_field]["min_val"], "lte": range_fields_value[range_field]["max_val"]}}})
     # extracted dictionary of sort fields and its sorting type
     sortlist = response["sortlist"]
     # extracted fields based on which search will be performed
@@ -185,6 +189,9 @@ def search():
                 },
                 "by_category": {
                     "terms": {"field": "category_name", "size": 1000}
+                },
+                "by_packsize": {
+                    "terms": {"field": "pack_size", "size": 1000}
                 }
             }})
         body = {
@@ -203,6 +210,7 @@ def search():
         res_1["banner_response"] = banner_res
         res_1["by_brand"] = res_1["search_response"]["aggregations"]["by_brand"]["buckets"]
         res_1["by_category"] = res_1["search_response"]["aggregations"]["by_category"]["buckets"]
+        res_1["by_packsize"] = res_1["search_response"]["aggregations"]["by_packsize"]["buckets"]
         return (res_1)
     pattern = re.compile('\W')
     # input went through sanitization
@@ -251,6 +259,9 @@ def search():
                 },
                 "by_category": {
                     "terms": {"field": "category_name", "size": 1000}
+                },
+                "by_packsize": {
+                    "terms": {"field": "pack_size", "size": 1000}
                 }
             }
         }
@@ -338,7 +349,10 @@ def search():
                     },
                     "by_category": {
                         "terms": {"field": "category_name", "size": 1000}
-                    }
+                    },
+                "by_packsize": {
+                    "terms": {"field": "pack_size", "size": 1000}
+                }
                 }
             }
             )
@@ -382,6 +396,8 @@ def search():
         res["banner_response"] = banner_response
         res["by_brand"] = res["search_response"]["aggregations"]["by_brand"]["buckets"]
         res["by_category"] = res["search_response"]["aggregations"]["by_category"]["buckets"]
+        res["by_packsize"] = res["search_response"]["aggregations"]["by_packsize"]["buckets"]
+
         return (res)
     except NotFoundError as es1:
         return es1.info, es1.status_code
@@ -445,6 +461,7 @@ def update(indexname):
             bulk_data = [bulk_data]
         for data in bulk_data:
             data["list_price"] = float(data["list_price"])
+            data["discount"] = float(data["discount"])
             # extraction of category in to new key
             data["category_name"] = data["category"]
             # extraction of brand in to new key
@@ -456,6 +473,7 @@ def update(indexname):
             res = es.index(index=indexname, id=data["id"], body=data)
     if "synonym" in bulk_data_syno["root"].keys():
         synonymlist = bulk_data_syno["root"]["synonym"]["syno"]
+        print(synonymlist)
         if str(type(synonymlist)) == "<class 'str'>":
             synonymlist = [synonymlist]
         try:

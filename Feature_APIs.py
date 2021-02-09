@@ -529,7 +529,7 @@ def delete_synonym():
     requestf = request.get_json()
     # extraction of synonyms which needs to be deleted
     synonyms = requestf["synonyms"]
-    indexname=requestf["path"]
+    indexname=requestf["indexname"]
     path = "synonym.txt"  # synonym.txt file path
     with open(path, "r") as f:
         lines = f.readlines()
